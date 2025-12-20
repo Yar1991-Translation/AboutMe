@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- 基础 SEO -->
+    <title>Yatmt - 初中生折腾家 & 字幕搬运工（自带加班 Buff）</title>
+    <meta name="description" content="白天上课，晚上开荒项目。游戏/翻译/技术三栖出没：把有趣的游戏开发知识翻译给更多人，顺手搓点小工具让生活少点“手动挡”。" />
+    <meta name="keywords" content="Yatmt, 游戏开发, 字幕翻译, 技术博客, 开源项目, B站UP主" />
+    <meta name="author" content="Yatmt" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Yatmt - 初中生折腾家 & 字幕搬运工（自带加班 Buff）" />
+    <meta property="og:description" content="白天上课，晚上开荒项目。游戏/翻译/技术三栖出没：欢迎围观。" />
+    <meta property="og:image" content="%BASE_URL%avatar.svg" />
+    <meta property="og:locale" content="zh_CN" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Yatmt - 初中生折腾家 & 字幕搬运工（自带加班 Buff）" />
+    <meta name="twitter:description" content="白天上课，晚上开荒项目。游戏/翻译/技术三栖出没：欢迎围观。" />
+    <meta name="twitter:image" content="%BASE_URL%avatar.svg" />
+    
+    <!-- 主题色 -->
+    <meta name="theme-color" content="#6750a4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1c1b1f" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="apple-touch-icon" href="%BASE_URL%favicon.svg" />
+    
+    <!-- 预加载本地字体 -->
+    <link rel="preload" href="%BASE_URL%fonts/material-symbols-rounded.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="%BASE_URL%fonts/roboto-regular.woff2" as="font" type="font/woff2" crossorigin />
+    
+    <!-- 内联关键字体定义，确保在 mdui 加载前生效 -->
+    <style>
+      @font-face {
+        font-family: 'Material Symbols Rounded';
+        font-style: normal;
+        font-weight: 100 700;
+        src: url('%BASE_URL%fonts/material-symbols-rounded.woff2') format('woff2');
+        font-display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
