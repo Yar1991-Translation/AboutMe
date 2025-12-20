@@ -207,23 +207,7 @@ function App() {
               {activePage === 'repos' ? (
                 <Section
                   title="仓库"
-                  subtitle="全仓库展示（可在配置里开关）。下面这俩开关只是「当前默认规则提示」，不是运行时筛选。"
-                  actions={
-                    <>
-                      <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                        <mdui-switch checked={githubReposConfig.hideForks} disabled></mdui-switch>
-                        <span style={{ fontSize: 'var(--text-sm)', color: 'rgb(var(--mdui-color-on-surface-variant))' }}>
-                          隐藏 forks
-                        </span>
-                      </label>
-                      <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                        <mdui-switch checked={githubReposConfig.hideArchived} disabled></mdui-switch>
-                        <span style={{ fontSize: 'var(--text-sm)', color: 'rgb(var(--mdui-color-on-surface-variant))' }}>
-                          隐藏 archived
-                        </span>
-                      </label>
-                    </>
-                  }
+                  subtitle="全仓库展示（可在配置里开关）。"
                 >
                   <SubsRepos />
                 </Section>

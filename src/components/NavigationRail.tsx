@@ -23,7 +23,6 @@ type NavigationRailProps = {
 function NavigationRail({ active, onChange }: NavigationRailProps) {
   return (
     <aside className="nav-rail" aria-label="主导航">
-      <div className="nav-rail__brand">Yatmt</div>
       <div className="nav-rail__items">
         {railItems.map((it) => (
           <mdui-button
