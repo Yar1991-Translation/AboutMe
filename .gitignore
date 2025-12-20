@@ -35,3 +35,6 @@ src/data/generated-games.json
 
 .vercel
 .env*.local
+
+# accidental saved web pages/assets
+public/Audio_border static - *

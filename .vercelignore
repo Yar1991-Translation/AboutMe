@@ -20,3 +20,6 @@ Thumbs.db
 # Git
 .git
 
+# accidental saved web pages/assets
+public/Audio_border static - *
+
