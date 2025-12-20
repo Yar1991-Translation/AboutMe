@@ -46,3 +46,5 @@ function GameCard({ title, cover, subtitle, link, linkLabel = '去康康', platf
 
 export default GameCard
 
+
+

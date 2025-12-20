@@ -6,14 +6,14 @@
       "fullName": "Yar1991-Translation/AboutMe",
       "htmlUrl": "https://github.com/Yar1991-Translation/AboutMe",
       "description": "",
-      "homepage": "",
+      "homepage": "https://about-me-sable-beta.vercel.app",
       "language": "TypeScript",
       "topics": [],
       "stargazers": 0,
       "forks": 0,
-      "updatedAt": "2025-12-20T12:14:40Z",
+      "updatedAt": "2025-12-20T12:42:15Z",
       "createdAt": "2025-12-20T11:56:14Z",
-      "pushedAt": "2025-12-20T12:14:36Z",
+      "pushedAt": "2025-12-20T12:42:11Z",
       "fork": false,
       "archived": false
     },
@@ -275,5 +275,5 @@
       "archived": false
     }
   ],
-  "generatedAt": "2025-12-20T12:19:09.759Z"
+  "generatedAt": "2025-12-20T18:14:56.809Z"
 }

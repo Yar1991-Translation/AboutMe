@@ -34,3 +34,5 @@ function SvgIcon({ file, className = '', slot, size = 20, title }: SvgIconProps)
 export default SvgIcon
 
 
+
+

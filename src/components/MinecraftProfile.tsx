@@ -81,3 +81,5 @@ function MinecraftProfile({ profile }: MinecraftProfileProps) {
 
 export default MinecraftProfile
 
+
+

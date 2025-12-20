@@ -1,5 +1,6 @@
 import Icon from './Icon'
 import SvgIcon from './SvgIcon'
+import type { ReactNode } from 'react'
 
 type HeroProps = {
   name: string
@@ -10,6 +11,7 @@ type HeroProps = {
   tags?: string[]
   primaryAction: { label: string; href: string; icon?: string }
   secondaryAction?: { label: string; href: string; icon?: string }
+  side?: ReactNode
 }
 
 function Hero({
@@ -21,6 +23,7 @@ function Hero({
   tags,
   primaryAction,
   secondaryAction,
+  side,
 }: HeroProps) {
   const renderSocialIcon = (href: string, fallback?: string) => {
     const h = href.toLowerCase()
@@ -75,6 +78,7 @@ function Hero({
             )}
           </div>
         </div>
+        {side ? <div className="hero-side">{side}</div> : null}
       </div>
     </mdui-card>
   )

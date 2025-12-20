@@ -1,0 +1,7 @@
+if (typeof window !== 'undefined' && window.rbx && window.rbx.postMessage) {
+  try {
+    window.rbx.postMessage('loadprogress', 'afterInteractive');
+  } catch (e) {
+    console.error('WebViewProgressScript Error', e);
+  }
+}

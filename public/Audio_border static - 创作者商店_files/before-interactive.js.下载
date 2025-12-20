@@ -1,0 +1,22 @@
+if (typeof window !== 'undefined' && window.rbx && window.rbx.studio) {
+  try {
+    const theme = sessionStorage.web_view_theme_override || window.rbx.studio.theme;
+    const light = theme.includes('light');
+    document.documentElement.style.colorScheme = light ? 'light' : 'dark';
+    if (theme.toLowerCase().includes('foundation')) {
+      document.documentElement.style.backgroundColor = light ? '#FFFFFF' : '#272930';
+    } else {
+      document.documentElement.style.backgroundColor = light ? '#FFFFFF' : '#2E2E2E';
+    }
+  } catch (e) {
+    console.error('WebViewColorScript Error', e);
+  }
+}
+
+if (typeof window !== 'undefined' && window.rbx && window.rbx.postMessage) {
+  try {
+    window.rbx.postMessage('loadprogress', 'beforeInteractive');
+  } catch (e) {
+    console.error('WebViewProgressScript Error', e);
+  }
+}

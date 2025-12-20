@@ -14,12 +14,17 @@ import type { RailPageId } from './components/NavigationRail'
 import BottomNavigation from './components/BottomNavigation'
 import RepoCard from './components/RepoCard'
 import SeasonPicker from './components/SeasonPicker'
+import BiliProfileCard from './components/BiliProfileCard'
+import BiliLiveCard from './components/BiliLiveCard'
+import BiliVideoGrid from './components/BiliVideoGrid'
 import { content } from './content'
 import generatedSubs from './data/generated-subs-repos.json'
 import generatedGames from './data/generated-games.json'
 import type { GeneratedSubsRepos, GithubSubsRepo } from './types/subs'
 import type { GeneratedGames } from './types/games'
 import { githubReposConfig } from './config/githubRepos'
+import { bilibiliConfig } from './config/bilibili'
+import { biliApi } from './services/bilibili'
 import {
   getEffectiveSeason,
   getSeasonSeedColor,
@@ -40,6 +45,15 @@ function App() {
   const [activePage, setActivePage] = useState<RailPageId>('home')
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>(getInitialTheme)
   const [seasonPreference, setSeasonPreference] = useState<SeasonPreference>(getStoredSeasonPreference)
+  const [heroBiliTab, setHeroBiliTab] = useState<'me' | 'friends'>('me')
+
+  const [biliLoading, setBiliLoading] = useState(false)
+  const [biliError, setBiliError] = useState<string | null>(null)
+  const [biliProfiles, setBiliProfiles] = useState<Record<number, Awaited<ReturnType<typeof biliApi.profile>> | null>>({})
+  const [biliStats, setBiliStats] = useState<Record<number, Awaited<ReturnType<typeof biliApi.stats>> | null>>({})
+  const [biliLives, setBiliLives] = useState<Record<number, Awaited<ReturnType<typeof biliApi.live>> | null>>({})
+  const [biliLatest, setBiliLatest] = useState<Record<number, Awaited<ReturnType<typeof biliApi.latest>> | null>>({})
+  const [biliPinnedVideos, setBiliPinnedVideos] = useState<Record<number, Awaited<ReturnType<typeof biliApi.videos>> | null>>({})
 
   useEffect(() => {
     setTheme(themeMode)
@@ -54,6 +68,80 @@ function App() {
     // 关键：让 mdui 的整套 MD3 palette 跟随季节切换
     setColorScheme(getSeasonSeedColor(effective))
   }, [seasonPreference])
+
+  useEffect(() => {
+    let cancelled = false
+    const run = async () => {
+      setBiliLoading(true)
+      setBiliError(null)
+      try {
+        const channels = bilibiliConfig.channels
+        const ps = bilibiliConfig.latestCount
+
+        const perChannel = await Promise.all(
+          channels.map(async (c) => {
+            const bvids = (c.pinnedBvIds ?? []).slice(0, 10)
+            const pinnedPromise: Promise<Awaited<ReturnType<typeof biliApi.videos>> | null> = bvids.length
+              ? biliApi.videos(bvids)
+              : Promise.resolve(null)
+            const [p, s, l, lat, pinned] = await Promise.allSettled([
+              biliApi.profile(c.mid),
+              biliApi.stats(c.mid),
+              biliApi.live(c.mid),
+              biliApi.latest(c.mid, ps),
+              pinnedPromise,
+            ])
+
+            return {
+              mid: c.mid,
+              profile: p.status === 'fulfilled' ? p.value : null,
+              stats: s.status === 'fulfilled' ? s.value : null,
+              live: l.status === 'fulfilled' ? l.value : null,
+              latest: lat.status === 'fulfilled' ? lat.value : null,
+              pinned: pinned.status === 'fulfilled' ? pinned.value : null,
+              errors: [p, s, l, lat, pinned]
+                .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+                .map((r) => (r.reason instanceof Error ? r.reason.message : String(r.reason))),
+            }
+          })
+        )
+
+        if (cancelled) return
+
+        const profilesObj: Record<number, Awaited<ReturnType<typeof biliApi.profile>> | null> = {}
+        const statsObj: Record<number, Awaited<ReturnType<typeof biliApi.stats>> | null> = {}
+        const livesObj: Record<number, Awaited<ReturnType<typeof biliApi.live>> | null> = {}
+        const latestObj: Record<number, Awaited<ReturnType<typeof biliApi.latest>> | null> = {}
+        const pinnedObj: Record<number, Awaited<ReturnType<typeof biliApi.videos>> | null> = {}
+
+        for (const r of perChannel) {
+          profilesObj[r.mid] = r.profile
+          statsObj[r.mid] = r.stats
+          livesObj[r.mid] = r.live
+          latestObj[r.mid] = r.latest
+          pinnedObj[r.mid] = r.pinned
+        }
+
+        setBiliProfiles(profilesObj)
+        setBiliStats(statsObj)
+        setBiliLives(livesObj)
+        setBiliLatest(latestObj)
+        setBiliPinnedVideos(pinnedObj)
+
+        const anySuccess = perChannel.some((r) => r.profile || r.stats || r.live || r.latest || r.pinned)
+        const allErrors = perChannel.flatMap((r) => r.errors).filter(Boolean)
+        if (!anySuccess && allErrors.length) setBiliError(allErrors[0])
+      } catch (e) {
+        if (!cancelled) setBiliError(e instanceof Error ? e.message : 'B站数据加载失败')
+      } finally {
+        if (!cancelled) setBiliLoading(false)
+      }
+    }
+    run()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -130,9 +218,96 @@ function App() {
             <div className="page">
               {activePage === 'home' ? (
                 <>
-                  <Hero {...content.hero} />
+                  <Hero
+                    {...content.hero}
+                    side={
+                      <div className="hero-bili">
+                        <div className="hero-bili__tabs" role="tablist" aria-label="B站直播切换">
+                          <mdui-button
+                            className="hero-bili__tabbtn"
+                            variant={heroBiliTab === 'me' ? 'tonal' : 'text'}
+                            onClick={() => setHeroBiliTab('me')}
+                            aria-selected={heroBiliTab === 'me'}
+                          >
+                            我
+                          </mdui-button>
+                          <mdui-button
+                            className="hero-bili__tabbtn"
+                            variant={heroBiliTab === 'friends' ? 'tonal' : 'text'}
+                            onClick={() => setHeroBiliTab('friends')}
+                            aria-selected={heroBiliTab === 'friends'}
+                          >
+                            朋友
+                          </mdui-button>
+                        </div>
+
+                        <div className="hero-bili__body">
+                          {biliLoading ? (
+                            <div className="hero-bili__empty">正在拉取直播状态…</div>
+                          ) : biliError ? (
+                            <div className="hero-bili__empty">直播状态加载失败</div>
+                          ) : (
+                            (() => {
+                              const me = bilibiliConfig.channels.find((c) => !c.isFriend) ?? bilibiliConfig.channels[0]
+                              const friends = bilibiliConfig.channels.filter((c) => c.isFriend)
+                              const picked = heroBiliTab === 'friends' ? friends : me ? [me] : []
+                              if (!picked.length) return <div className="hero-bili__empty">暂无直播信息</div>
+
+                              return (
+                                <div className="hero-bili__list">
+                                  {picked.map((c) => {
+                                    const l = biliLives[c.mid]
+                                    return l ? (
+                                      <BiliLiveCard key={c.mid} label={c.label} isFriend={c.isFriend} live={l} />
+                                    ) : (
+                                      <div key={c.mid} className="hero-bili__empty">
+                                        {c.label}：暂无直播信息
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              )
+                            })()
+                          )}
+                        </div>
+                      </div>
+                    }
+                  />
                   <Section title="快速入口" subtitle="先把常用的放这儿，省得你翻翻翻。">
                     <ContactBar contacts={content.contacts} variant="tonal" />
+                  </Section>
+
+                  <Section title="B站动态" subtitle="我和朋友们的 B站更新（由 Vercel 代理拉取）。">
+                    {biliLoading ? (
+                      <div className="empty-state">
+                        <Icon name="schedule" className="empty-state__icon" />
+                        <p className="empty-state__text">正在拉取 B站数据…</p>
+                      </div>
+                    ) : biliError ? (
+                      <div className="empty-state">
+                        <Icon name="warning" className="empty-state__icon" />
+                        <p className="empty-state__text">B站数据加载失败：{biliError}</p>
+                      </div>
+                    ) : (
+                      <div className="bili-section">
+                        {bilibiliConfig.channels.map((c) => {
+                          const p = biliProfiles[c.mid]
+                          const s = biliStats[c.mid]
+                          const latest = biliLatest[c.mid]?.items ?? []
+                          const pinned = biliPinnedVideos[c.mid]?.items ?? []
+
+                          return (
+                            <div key={c.mid} className="bili-channel">
+                              {p && s ? (
+                                <BiliProfileCard label={c.label} isFriend={c.isFriend} profile={p} stats={s} />
+                              ) : null}
+                              {pinned.length ? <BiliVideoGrid title="置顶/精选" items={pinned} /> : null}
+                              <BiliVideoGrid title="最新视频" items={latest} />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                   </Section>
 
                   <Section

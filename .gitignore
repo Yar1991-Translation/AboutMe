@@ -32,3 +32,6 @@ src/data/generated-games.json
 *.sln
 *.sw?
 
+
+.vercel
+.env*.local
