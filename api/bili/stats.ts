@@ -10,26 +10,25 @@ export default async function handler(req: Request): Promise<Response> {
   const mid = getMid(req)
   if (!mid) return err('missing mid', 400)
 
-  const [relRes, upstatRes] = await Promise.all([
-    biliFetch(`https://api.bilibili.com/x/relation/stat?vmid=${mid}`),
-    biliFetch(`https://api.bilibili.com/x/space/upstat?mid=${mid}`),
-  ])
+  // 统一用 card 接口拿关注/粉丝/获赞（upstat 在部分网络环境会返回 data:{}）
+  const res = await biliFetch(`https://api.bilibili.com/x/web-interface/card?mid=${mid}&photo=true`, {
+    headers: { Referer: 'https://space.bilibili.com/' },
+  })
+  if (!res.ok) return err('upstream error', 502)
+  const raw = await res.json()
+  if (raw?.code !== 0) return err(raw?.message ?? 'upstream error', 502)
 
-  if (!relRes.ok || !upstatRes.ok) return err('upstream error', 502)
-
-  const rel = await relRes.json()
-  const upstat = await upstatRes.json()
-
-  if (rel?.code !== 0) return err(rel?.message ?? 'upstream error', 502)
-  if (upstat?.code !== 0) return err(upstat?.message ?? 'upstream error', 502)
+  const card = raw?.data?.card ?? {}
+  const likeNum = Number(raw?.data?.like_num ?? 0)
 
   return json(
     {
       mid,
-      following: Number(rel?.data?.following ?? 0),
-      follower: Number(rel?.data?.follower ?? 0),
-      likes: Number(upstat?.data?.likes ?? 0),
-      archiveView: Number(upstat?.data?.archive?.view ?? 0),
+      following: Number(card.attention ?? 0),
+      follower: Number(card.fans ?? 0),
+      likes: likeNum,
+      // card 不提供总播放量；保持 0（前端只用到 likes/follower/following）
+      archiveView: 0,
     },
     { headers: { 'Cache-Control': 's-maxage=600, stale-while-revalidate=3600' } }
   )

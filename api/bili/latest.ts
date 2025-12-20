@@ -13,22 +13,24 @@ export default async function handler(req: Request): Promise<Response> {
   const u = new URL(req.url)
   const ps = Math.min(Math.max(Number(u.searchParams.get('ps') ?? 6), 1), 20)
 
+  // 用 series 接口替代 space/arc/search（arc/search 容易被限流返回 -799）
   const res = await biliFetch(
-    `https://api.bilibili.com/x/space/arc/search?mid=${mid}&pn=1&ps=${ps}&order=pubdate`
+    `https://api.bilibili.com/x/series/recArchivesByKeywords?mid=${mid}&keywords=&pn=1&ps=${ps}`,
+    { headers: { Referer: 'https://space.bilibili.com/' } }
   )
   if (!res.ok) return err('upstream error', 502)
   const raw = await res.json()
   if (raw?.code !== 0) return err(raw?.message ?? 'upstream error', 502)
 
-  const list = raw?.data?.list?.vlist ?? []
+  const list = raw?.data?.archives ?? []
   const mapped = list.map((it: any) => ({
     bvid: it?.bvid ?? '',
     aid: Number(it?.aid ?? 0),
     title: it?.title ?? '',
     cover: it?.pic ?? '',
-    created: Number(it?.created ?? 0) * 1000,
-    play: Number(it?.play ?? 0),
-    danmaku: Number(it?.video_review ?? 0),
+    created: Number(it?.pubdate ?? 0) * 1000,
+    play: Number(it?.stat?.view ?? 0),
+    danmaku: 0,
     url: it?.bvid ? `https://www.bilibili.com/video/${it.bvid}` : '',
   }))
 
