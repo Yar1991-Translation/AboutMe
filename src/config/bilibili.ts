@@ -9,10 +9,14 @@ export type BiliChannel = {
   pinnedBvIds?: string[]
 }
 
-export const bilibiliConfig: {
+import { ensureArray, ensureBoolean, ensureNumber, ensureString } from '../utils/config'
+
+export type BiliConfig = {
   channels: BiliChannel[]
   latestCount: number
-} = {
+}
+
+const rawConfig = {
   // 你自己的 mid（从 space 链接可得：https://space.bilibili.com/517013017）
   // 朋友 mid：把 mid 填进来，并设 isFriend: true
   channels: [
@@ -21,6 +25,20 @@ export const bilibiliConfig: {
     // { mid: 234567, label: '朋友B', isFriend: true },
   ],
   latestCount: 6,
+}
+
+const normalizedChannels = ensureArray<BiliChannel>(rawConfig.channels)
+  .map((c) => ({
+    mid: ensureNumber(c.mid, 0),
+    label: ensureString(c.label, ''),
+    isFriend: ensureBoolean(c.isFriend, false),
+    pinnedBvIds: ensureArray<string>(c.pinnedBvIds).filter((id) => typeof id === 'string' && id.trim().length > 0),
+  }))
+  .filter((c) => c.mid > 0 && c.label)
+
+export const bilibiliConfig: BiliConfig = {
+  channels: normalizedChannels,
+  latestCount: Math.max(1, ensureNumber(rawConfig.latestCount, 6)),
 }
 
 

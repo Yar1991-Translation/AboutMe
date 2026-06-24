@@ -7,7 +7,16 @@
  * - hideForks: 是否隐藏 fork 的仓库
  * - hideArchived: 是否隐藏归档仓库
  */
-export const githubReposConfig = {
+import { ensureBoolean, ensureRecord } from '../utils/config'
+
+export type GithubReposConfig = {
+  showAll: boolean
+  hideForks: boolean
+  hideArchived: boolean
+  allowList: Record<string, boolean>
+}
+
+const rawConfig = {
   showAll: true,
   hideForks: false,
   hideArchived: true,
@@ -15,6 +24,17 @@ export const githubReposConfig = {
     // 'Yar1991-Translation/Subtitle-Sharing': true,
     // 'Yar1991-Translation/LoArchive': false,
   } as Record<string, boolean>,
+}
+
+const rawAllowList = ensureRecord(rawConfig.allowList)
+
+export const githubReposConfig: GithubReposConfig = {
+  showAll: ensureBoolean(rawConfig.showAll, true),
+  hideForks: ensureBoolean(rawConfig.hideForks, false),
+  hideArchived: ensureBoolean(rawConfig.hideArchived, true),
+  allowList: Object.fromEntries(
+    Object.entries(rawAllowList).map(([key, value]) => [key, ensureBoolean(value, false)])
+  ),
 }
 
 

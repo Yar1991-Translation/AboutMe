@@ -38,6 +38,36 @@ type ApiError = { error: true; message: string }
 const memCache = new Map<string, { expiresAt: number; value: unknown }>()
 const inFlight = new Map<string, Promise<unknown>>()
 
+// #region agent log
+const __agentLog = (hypothesisId: string, location: string, message: string, data?: Record<string, unknown>) => {
+  fetch('http://127.0.0.1:7242/ingest/8e90f98a-cd24-466f-8c9a-9a109b1b6a8e', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: 'debug-session',
+      runId: 'pre',
+      hypothesisId,
+      location,
+      message,
+      data,
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {})
+}
+try {
+  const origin =
+    typeof window !== 'undefined' && typeof window.location?.origin === 'string' ? window.location.origin : 'ssr/unknown'
+  __agentLog('D', 'src/services/bilibili.ts:init', 'bili service init', {
+    mode: (import.meta as any)?.env?.MODE,
+    prod: (import.meta as any)?.env?.PROD,
+    apiBase: (import.meta as any)?.env?.VITE_BILI_API_BASE,
+    origin,
+  })
+} catch {
+  // ignore
+}
+// #endregion
+
 const API_BASE = (() => {
   const raw = import.meta.env.VITE_BILI_API_BASE as string | undefined
   const v = (raw ?? '').trim()
@@ -57,11 +87,40 @@ const cachedFetchJson = async <T>(url: string, ttlMs = 30_000): Promise<T> => {
   if (running) return (await running) as T
 
   const run = (async () => {
+    // #region agent log
+    try {
+      const origin =
+        typeof window !== 'undefined' && typeof window.location?.origin === 'string'
+          ? window.location.origin
+          : 'ssr/unknown'
+      __agentLog('A', 'src/services/bilibili.ts:cachedFetchJson', 'fetch start', {
+        url,
+        apiBase: API_BASE || '',
+        origin,
+      })
+    } catch {
+      // ignore
+    }
+    // #endregion
+
     let lastErr: unknown = null
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         const res = await fetch(url, { method: 'GET' })
         const data = (await res.json().catch(() => ({}))) as T | ApiError
+        // #region agent log
+        try {
+          __agentLog('B', 'src/services/bilibili.ts:cachedFetchJson', 'fetch response', {
+            url,
+            status: res.status,
+            ok: res.ok,
+            apiError: Boolean((data as any)?.error),
+            message: typeof (data as any)?.message === 'string' ? (data as any).message : '',
+          })
+        } catch {
+          // ignore
+        }
+        // #endregion
         if (!res.ok || (data as ApiError)?.error) {
           const msg =
             (data as ApiError)?.message ??
@@ -75,6 +134,17 @@ const cachedFetchJson = async <T>(url: string, ttlMs = 30_000): Promise<T> => {
         return data as T
       } catch (e) {
         lastErr = e
+        // #region agent log
+        try {
+          __agentLog('C', 'src/services/bilibili.ts:cachedFetchJson', 'fetch error', {
+            url,
+            attempt,
+            error: e instanceof Error ? e.message : String(e),
+          })
+        } catch {
+          // ignore
+        }
+        // #endregion
         // 轻量重试：给网络波动/502 一个机会
         if (attempt === 0) await sleep(250)
       }
