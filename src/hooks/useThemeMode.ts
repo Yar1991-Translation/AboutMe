@@ -1,20 +1,9 @@
-import { useEffect, useState } from 'react'
-import { setTheme } from 'mdui/functions/setTheme'
+import { useTheme } from '@/theme/ThemeProvider'
 
-const getInitialTheme = () => {
-  if (typeof window === 'undefined') return 'light'
-  const stored = localStorage.getItem('theme-mode')
-  if (stored === 'light' || stored === 'dark') return stored
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
+/**
+ * 亮/暗模式。底层状态由 ThemeProvider 统一管理。
+ */
 export const useThemeMode = () => {
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>(getInitialTheme)
-
-  useEffect(() => {
-    setTheme(themeMode)
-    localStorage.setItem('theme-mode', themeMode)
-  }, [themeMode])
-
+  const { themeMode, setThemeMode } = useTheme()
   return { themeMode, setThemeMode }
 }

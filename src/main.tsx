@@ -1,19 +1,24 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css' // 本地样式优先加载
-import 'mdui/mdui.css'
+import '@/theme/tokens.css' // 设计变量优先
+import '@/styles/base.css'
+import 'mdui/mdui.css' // 过渡期：组件迁移完成后移除
 import 'mdui'
-import App from './App.tsx'
+import '@/primitives/material' // 注册 @material/web 组件
+import { ThemeProvider, initThemeBeforePaint } from '@/theme/ThemeProvider'
+import App from '@/App.tsx'
+
+// 首帧前注入主题，避免颜色闪烁
+initThemeBeforePaint()
 
 // 确保 Material Symbols 字体加载完成
 const loadIconFont = async () => {
   try {
     const base = import.meta.env.BASE_URL
-    // 使用 FontFace API 显式加载字体
     const font = new FontFace(
       'Material Symbols Rounded',
       `url(${base}fonts/material-symbols-rounded.woff2)`,
-      { weight: '100 700', style: 'normal' }
+      { weight: '100 700', style: 'normal' },
     )
     await font.load()
     document.fonts.add(font)
@@ -22,11 +27,12 @@ const loadIconFont = async () => {
   }
 }
 
-// 等待字体加载后再渲染
 loadIconFont().then(() => {
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </StrictMode>,
+  )
 })

@@ -1,23 +1,9 @@
-import { useEffect, useState } from 'react'
-import { setColorScheme } from 'mdui/functions/setColorScheme'
-import {
-  getEffectiveSeason,
-  getSeasonSeedColor,
-  getStoredSeasonPreference,
-  storeSeasonPreference,
-  type SeasonPreference,
-} from '../theme/season'
+import { useTheme } from '@/theme/ThemeProvider'
 
+/**
+ * 季节配色偏好。底层状态由 ThemeProvider 统一管理。
+ */
 export const useSeasonPreference = () => {
-  const [seasonPreference, setSeasonPreference] = useState<SeasonPreference>(getStoredSeasonPreference)
-
-  useEffect(() => {
-    storeSeasonPreference(seasonPreference)
-    const effective = getEffectiveSeason(seasonPreference)
-    if (effective) document.documentElement.dataset.season = effective
-    else delete document.documentElement.dataset.season
-    setColorScheme(getSeasonSeedColor(effective))
-  }, [seasonPreference])
-
+  const { seasonPreference, setSeasonPreference } = useTheme()
   return { seasonPreference, setSeasonPreference }
 }

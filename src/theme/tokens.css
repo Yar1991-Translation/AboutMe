@@ -1,0 +1,148 @@
+/* ============================================================
+ * 设计 Token —— 全站唯一的设计变量来源
+ * 颜色角色（--md-sys-color-* / --mdui-color-*）由 theme/md-theme.ts
+ * 在运行时根据季节种子色生成并注入，这里只放静态设计 token。
+ * ============================================================ */
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/roboto-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/roboto-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/roboto-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  font-style: normal;
+  font-weight: 100 700;
+  src: url('/fonts/material-symbols-rounded.woff2') format('woff2');
+  font-display: block;
+}
+
+:root {
+  /* ========== 字体系统 ========== */
+  font-family: 'Roboto', 'Noto Sans SC', '思源黑体', 'Microsoft YaHei', system-ui,
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: light dark;
+
+  /* @material/web 字体角色 */
+  --md-ref-typeface-brand: 'Roboto', 'Noto Sans SC', system-ui, sans-serif;
+  --md-ref-typeface-plain: 'Roboto', 'Noto Sans SC', system-ui, sans-serif;
+
+  /* 薄荷青强调色 - 5级明度变体（季节配色会覆盖） */
+  --accent-50: 236, 254, 255;
+  --accent-100: 207, 250, 254;
+  --accent-200: 165, 243, 252;
+  --accent-400: 34, 211, 238;
+  --accent-600: 8, 145, 178;
+  --accent-rgb: var(--accent-400);
+  --accent-on-rgb: 4, 47, 46;
+
+  /* 功能色系统 */
+  --color-success: 34, 197, 94;
+  --color-warning: 251, 146, 60;
+  --color-error: 239, 68, 68;
+
+  /* ========== 形状 / 圆角 ========== */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+  --radius-full: 999px;
+
+  /* ========== 间距 - 8pt grid ========== */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+
+  /* ========== 排版尺寸 ========== */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+
+  /* ========== 动画时长 ========== */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+
+  /* ========== 缓动函数 ========== */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ========== 阴影（MD3 elevation 近似） ========== */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 3px 1px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.16), 0 2px 6px 2px rgba(0, 0, 0, 0.1);
+  --shadow-3: 0 4px 8px 3px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+/* ========== 季节强调色（由 JS 写入 html[data-season]） ========== */
+:root[data-season='spring'] {
+  --accent-50: 236, 253, 245;
+  --accent-100: 209, 250, 229;
+  --accent-200: 167, 243, 208;
+  --accent-400: 34, 197, 94;
+  --accent-600: 21, 128, 61;
+  --accent-on-rgb: 3, 40, 20;
+}
+
+:root[data-season='summer'] {
+  --accent-50: 255, 251, 235;
+  --accent-100: 254, 243, 199;
+  --accent-200: 253, 230, 138;
+  --accent-400: 245, 158, 11;
+  --accent-600: 180, 83, 9;
+  --accent-on-rgb: 40, 25, 0;
+}
+
+:root[data-season='autumn'] {
+  --accent-50: 255, 247, 237;
+  --accent-100: 255, 237, 213;
+  --accent-200: 254, 215, 170;
+  --accent-400: 249, 115, 22;
+  --accent-600: 194, 65, 12;
+  --accent-on-rgb: 44, 18, 0;
+}
+
+:root[data-season='winter'] {
+  --accent-50: 239, 246, 255;
+  --accent-100: 219, 234, 254;
+  --accent-200: 191, 219, 254;
+  --accent-400: 59, 130, 246;
+  --accent-600: 29, 78, 216;
+  --accent-on-rgb: 6, 18, 38;
+}

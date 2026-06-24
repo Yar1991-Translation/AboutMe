@@ -1,0 +1,98 @@
+/* ============================================================
+ * 基础样式 —— reset、页面骨架、图标字体
+ * ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--md-sys-color-on-background, #1a1c1e);
+  background-color: var(--md-sys-color-background, #fafcff);
+  transition: background-color var(--duration-base) var(--ease-in-out),
+    color var(--duration-base) var(--ease-in-out);
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ========== 本地化 Material Symbols ========== */
+.material-symbols-rounded,
+md-icon {
+  font-family: 'Material Symbols Rounded';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' var(--icon-fill, 0), 'wght' var(--icon-weight, 400),
+    'GRAD' var(--icon-grad, 0), 'opsz' var(--icon-opsz, 24);
+}
+
+/* 让 @material/web 默认使用本地 Material Symbols 字体 */
+:root {
+  --md-icon-font: 'Material Symbols Rounded';
+}
+
+/* 过渡期：强制 mdui 组件也使用本地图标字体（组件迁移完成后可删） */
+mdui-icon,
+mdui-icon::part(icon),
+mdui-button-icon::part(icon),
+[class*='material-symbols'] {
+  font-family: 'Material Symbols Rounded' !important;
+  font-variation-settings: 'FILL' var(--icon-fill, 0), 'wght' var(--icon-weight, 400),
+    'GRAD' var(--icon-grad, 0), 'opsz' var(--icon-opsz, 24) !important;
+}
+
+:root {
+  --mdui-icon-font-family: 'Material Symbols Rounded';
+}
+
+/* SVG 蒙版图标：用 currentColor 上色，便于跟随主题 */
+.svg-mask-icon {
+  display: inline-block;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* ========== 全局尊重「减少动态效果」 ========== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
