@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 import Section from '../components/Section'
 import ContactBar from '../components/ContactBar'
 import Hero from '../components/Hero'
@@ -6,7 +7,6 @@ import Icon from '../components/Icon'
 import GameCard from '../components/GameCard'
 import RepoCard from '../components/RepoCard'
 import BiliLiveCard from '../components/BiliLiveCard'
-import type { RailPageId } from '../components/NavigationRail'
 import { content } from '../content'
 import generatedSubs from '../data/generated-subs-repos.json'
 import generatedGames from '../data/generated-games.json'
@@ -21,10 +21,6 @@ import { useInView } from '../hooks/useInView'
 
 const BiliSection = lazy(() => import('../sections/BiliSection'))
 
-type HomePageProps = {
-  onNavigate: (id: RailPageId) => void
-}
-
 const emptyFallback = (
   <Section title="B站动态" subtitle="我和朋友们的 B站更新（由 Vercel 代理拉取）。">
     <div className="empty-state">
@@ -37,7 +33,8 @@ const emptyFallback = (
 const subsData = generatedSubs as GeneratedSubsRepos
 const gameData = generatedGames as GeneratedGames
 
-function HomePage({ onNavigate }: HomePageProps) {
+function HomePage() {
+  const navigate = useNavigate()
   const [heroBiliTab, setHeroBiliTab] = useState<'me' | 'friends'>('me')
   const { ref: biliRef, inView: biliInView } = useInView<HTMLDivElement>({ rootMargin: '200px', threshold: 0.1 })
   const [idleReady, setIdleReady] = useState(false)
@@ -136,7 +133,7 @@ function HomePage({ onNavigate }: HomePageProps) {
         title={Object.keys(githubReposConfig.allowList ?? {}).some((k) => githubReposConfig.allowList[k]) ? '精选仓库' : '仓库速览'}
         subtitle="置顶优先；没置顶就按「看起来最像精选」的来。"
         actions={
-          <mdui-button variant="text" onClick={() => onNavigate('repos')}>
+          <mdui-button variant="text" onClick={() => navigate('/repos')}>
             去仓库页
           </mdui-button>
         }
@@ -164,7 +161,7 @@ function HomePage({ onNavigate }: HomePageProps) {
         title="最近在玩"
         subtitle="Steam Top N（按抓取顺序）。"
         actions={
-          <mdui-button variant="text" onClick={() => onNavigate('games')}>
+          <mdui-button variant="text" onClick={() => navigate('/games')}>
             去游戏页
           </mdui-button>
         }

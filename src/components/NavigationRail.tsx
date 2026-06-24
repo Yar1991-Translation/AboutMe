@@ -6,14 +6,23 @@ type RailItem = {
   id: RailPageId
   label: string
   icon: string
+  path: string
 }
 
 export const railItems: RailItem[] = [
-  { id: 'home', label: '主页', icon: 'home' },
-  { id: 'games', label: '游戏', icon: 'sports_esports' },
-  { id: 'repos', label: '仓库', icon: 'folder' },
-  { id: 'contact', label: '联系', icon: 'contact_mail' },
+  { id: 'home', label: '主页', icon: 'home', path: '/' },
+  { id: 'games', label: '游戏', icon: 'sports_esports', path: '/games' },
+  { id: 'repos', label: '仓库', icon: 'folder', path: '/repos' },
+  { id: 'contact', label: '联系', icon: 'contact_mail', path: '/contact' },
 ]
+
+export const railIdToPath = (id: RailPageId): string =>
+  railItems.find((it) => it.id === id)?.path ?? '/'
+
+export const pathToRailId = (pathname: string): RailPageId => {
+  const match = railItems.find((it) => it.path === pathname)
+  return match?.id ?? 'home'
+}
 
 type NavigationRailProps = {
   active: RailPageId
