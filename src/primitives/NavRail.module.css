@@ -1,0 +1,87 @@
+/* 桌面侧边导航栏 — 隐藏于 <600px */
+.rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-2xl) 0;
+  background-color: var(--md-sys-color-surface);
+  z-index: 20;
+}
+
+.brand {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-lg);
+  color: var(--md-sys-color-on-surface-variant);
+  text-decoration: none;
+  position: relative;
+  transition: color var(--duration-base) var(--ease-in-out);
+}
+
+.active {
+  color: var(--md-sys-color-primary);
+  font-weight: 500;
+}
+
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 32px;
+}
+
+.indicator {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--md-sys-color-secondary-container);
+  z-index: -1;
+}
+
+.icon {
+  font-size: 24px;
+  --icon-opsz: 24;
+}
+
+.label {
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 599px) {
+  .rail {
+    display: none;
+  }
+}

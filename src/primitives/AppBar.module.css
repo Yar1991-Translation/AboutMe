@@ -1,0 +1,77 @@
+/* 顶部应用栏 */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--shadow-1);
+  transition: background-color var(--duration-base) var(--ease-in-out);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  height: 64px;
+  padding: 0 var(--space-lg);
+  max-width: 100%;
+}
+
+.leading {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--md-sys-color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grow {
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.actionBtn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-in-out);
+}
+
+.actionBtn:hover {
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 8%, transparent);
+}
+
+.actionBtn:active {
+  background-color: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 12%, transparent);
+}
+
+@media (max-width: 599px) {
+  .inner {
+    height: 56px;
+    padding: 0 var(--space-md);
+  }
+  .title {
+    font-size: var(--text-lg);
+  }
+}

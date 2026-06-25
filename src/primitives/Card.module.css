@@ -1,0 +1,41 @@
+.card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  color: var(--md-sys-color-on-surface);
+  transition: box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-emphasized),
+    background-color var(--duration-base) var(--ease-in-out);
+}
+
+.elevated {
+  background-color: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--shadow-1);
+}
+
+.filled {
+  background-color: var(--md-sys-color-surface-container-highest);
+}
+
+.outlined {
+  background-color: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.interactive {
+  cursor: default;
+}
+
+.interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-3);
+}
+
+.elevated.interactive:hover {
+  box-shadow: var(--shadow-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,63 @@
+/* 移动端底部导航栏 — 仅 <600px 可见 */
+.bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: var(--md-sys-color-surface-container);
+  z-index: 20;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-lg);
+  color: var(--md-sys-color-on-surface-variant);
+  text-decoration: none;
+  position: relative;
+  transition: color var(--duration-base) var(--ease-in-out);
+}
+
+.item[data-active='true'],
+.item:global(.active) {
+  color: var(--md-sys-color-primary);
+}
+
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 32px;
+}
+
+.indicator {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--md-sys-color-secondary-container);
+  z-index: -1;
+}
+
+.icon {
+  font-size: 24px;
+  --icon-opsz: 24;
+}
+
+.label {
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 600px) {
+  .bar {
+    display: none;
+  }
+}
