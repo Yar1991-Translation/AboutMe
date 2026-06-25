@@ -1,38 +1,35 @@
 import type { SeasonPreference } from '../theme/season'
+import Button from '@/primitives/Button'
+import styles from './SeasonPicker.module.css'
 
 type SeasonPickerProps = {
   value: SeasonPreference
   onChange: (v: SeasonPreference) => void
 }
 
-const options: { value: SeasonPreference; label: string }[] = [
-  { value: 'auto', label: '自动（按地区）' },
-  { value: 'spring', label: '春' },
-  { value: 'summer', label: '夏' },
-  { value: 'autumn', label: '秋' },
-  { value: 'winter', label: '冬' },
-  { value: 'off', label: '关闭季节（固定主题）' },
+const options: { value: SeasonPreference; label: string; icon: string }[] = [
+  { value: 'auto', label: '自动（按地区）', icon: 'auto_mode' },
+  { value: 'spring', label: '春', icon: 'park' },
+  { value: 'summer', label: '夏', icon: 'wb_sunny' },
+  { value: 'autumn', label: '秋', icon: 'eco' },
+  { value: 'winter', label: '冬', icon: 'ac_unit' },
+  { value: 'off', label: '关闭', icon: 'block' },
 ]
 
-function SeasonPicker({ value, onChange }: SeasonPickerProps) {
+export default function SeasonPicker({ value, onChange }: SeasonPickerProps) {
   return (
-    <div className="season-picker" role="group" aria-label="季节配色">
+    <div className={styles.picker} role="group" aria-label="季节配色">
       {options.map((opt) => (
-        <mdui-button
+        <Button
           key={opt.value}
           variant={value === opt.value ? 'tonal' : 'text'}
-          className="season-picker__btn"
+          icon={opt.icon}
+          className={styles.btn}
           onClick={() => onChange(opt.value)}
         >
           {opt.label}
-        </mdui-button>
+        </Button>
       ))}
     </div>
   )
 }
-
-export default SeasonPicker
-
-
-
-

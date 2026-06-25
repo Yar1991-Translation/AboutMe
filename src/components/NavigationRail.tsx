@@ -34,16 +34,16 @@ function NavigationRail({ active, onChange }: NavigationRailProps) {
     <aside className="nav-rail" aria-label="主导航">
       <div className="nav-rail__items">
         {railItems.map((it) => (
-          <mdui-button
+          <button
             key={it.id}
-            variant={active === it.id ? 'tonal' : 'text'}
+            type="button"
             className={`nav-rail__item ${active === it.id ? 'is-active' : ''}`}
             onClick={() => onChange(it.id)}
             aria-current={active === it.id ? 'page' : undefined}
           >
-            <Icon name={it.icon} slot="icon" />
+            <Icon name={it.icon} />
             {it.label}
-          </mdui-button>
+          </button>
         ))}
       </div>
     </aside>
@@ -51,6 +51,3 @@ function NavigationRail({ active, onChange }: NavigationRailProps) {
 }
 
 export default NavigationRail
-
-
-

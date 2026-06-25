@@ -1,0 +1,265 @@
+/* ========== Bili Profile Card ========== */
+.profileCard {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.profileHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.profileTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 600;
+  font-size: var(--text-base);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.profileContent {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+  background-color: var(--md-sys-color-surface-container-high);
+  flex-shrink: 0;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.name {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--md-sys-color-on-surface);
+}
+
+.mid {
+  font-size: var(--text-xs);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.sign {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--md-sys-color-on-surface-variant);
+  line-height: 1.5;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.pill {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* ========== Bili Video Grid ========== */
+.videoCard {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.videoHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.videoTitle {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+
+.videoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+.videoItem {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--md-sys-color-surface-container);
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.videoItem:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-2);
+}
+
+.videoCover {
+  overflow: hidden;
+}
+
+.videoCover img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  background-color: var(--md-sys-color-surface-container-high);
+}
+
+.videoBody {
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.videoItemTitle {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.videoMeta {
+  display: flex;
+  gap: var(--space-sm);
+  font-size: var(--text-xs);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.videoEmpty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--text-sm);
+}
+
+/* ========== Bili Live Card ========== */
+.liveCard {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.liveHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.liveTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 600;
+  font-size: var(--text-base);
+}
+
+.liveDisabled {
+  font-size: var(--text-sm);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.liveBody {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.liveDot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--md-sys-color-outline);
+  flex-shrink: 0;
+  transition: background var(--duration-base) var(--ease-in-out);
+}
+
+.liveDotActive {
+  background: rgb(var(--color-success));
+  box-shadow: 0 0 6px rgba(var(--color-success), 0.5);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.embedSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.embed {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: var(--md-sys-color-surface-container);
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .videoItem:hover {
+    transform: none;
+  }
+  .liveDotActive {
+    animation: none;
+  }
+}

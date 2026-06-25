@@ -2,8 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@/theme/tokens.css' // 设计变量优先
 import '@/styles/base.css'
-import 'mdui/mdui.css' // 过渡期：组件迁移完成后移除
-import 'mdui'
 import '@/primitives/material' // 注册 @material/web 组件
 import { ThemeProvider, initThemeBeforePaint } from '@/theme/ThemeProvider'
 import App from '@/App.tsx'

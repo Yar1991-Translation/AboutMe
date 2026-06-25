@@ -1,5 +1,5 @@
-import type { PropsWithChildren } from 'react'
-import type { ReactNode } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
+import styles from './Section.module.css'
 
 type SectionProps = PropsWithChildren<{
   title: string
@@ -7,20 +7,17 @@ type SectionProps = PropsWithChildren<{
   actions?: ReactNode
 }>
 
-function Section({ title, subtitle, actions, children }: SectionProps) {
+export default function Section({ title, subtitle, actions, children }: SectionProps) {
   return (
-    <section className="section">
-      <div className="section__head">
-        <div className="section__title">
-          <h2>{title}</h2>
-          {subtitle ? <p>{subtitle}</p> : null}
+    <section className={styles.section}>
+      <div className={styles.head}>
+        <div className={styles.titleBlock}>
+          <h2 className={styles.title}>{title}</h2>
+          {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
         </div>
-        {actions ? <div className="section__actions">{actions}</div> : null}
+        {actions ? <div className={styles.actions}>{actions}</div> : null}
       </div>
       {children}
     </section>
   )
 }
-
-export default Section
-

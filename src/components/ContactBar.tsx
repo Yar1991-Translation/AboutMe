@@ -1,10 +1,13 @@
 import type { ContactType } from '../content'
 import Icon from './Icon'
 import SvgIcon from './SvgIcon'
+import Button from '@/primitives/Button'
+import type { ButtonVariant } from '@/primitives/Button'
+import styles from './ContactBar.module.css'
 
 type ContactBarProps = {
   contacts: { label: string; href: string; type: ContactType }[]
-  variant?: 'tonal' | 'filled' | 'outlined' | 'text' | 'elevated'
+  variant?: ButtonVariant
 }
 
 const iconName: Record<ContactType, string> = {
@@ -23,28 +26,19 @@ const svgFile: Partial<Record<ContactType, string>> = {
   email: 'mail.svg',
 }
 
-function ContactBar({ contacts, variant = 'outlined' }: ContactBarProps) {
+export default function ContactBar({ contacts, variant = 'outlined' }: ContactBarProps) {
   return (
-    <div className="contact-bar">
+    <div className={styles.bar}>
       {contacts.map((item) => (
-        <mdui-button
-          key={item.label}
-          variant={variant}
-          href={item.href}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <Button key={item.label} variant={variant} href={item.href} target="_blank" rel="noreferrer">
           {svgFile[item.type] ? (
-            <SvgIcon file={svgFile[item.type]!} slot="icon" />
+            <SvgIcon file={svgFile[item.type]!} />
           ) : (
-            <Icon name={iconName[item.type]} slot="icon" />
+            <Icon name={iconName[item.type]} />
           )}
           {item.label}
-        </mdui-button>
+        </Button>
       ))}
     </div>
   )
 }
-
-export default ContactBar
-

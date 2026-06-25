@@ -1,4 +1,5 @@
 import { railItems, type RailPageId } from './NavigationRail'
+import Icon from './Icon'
 
 type BottomNavigationProps = {
   active: RailPageId
@@ -16,11 +17,7 @@ function BottomNavigation({ active, onChange }: BottomNavigationProps) {
           onClick={() => onChange(it.id)}
           aria-current={active === it.id ? 'page' : undefined}
         >
-          <mdui-button-icon
-            icon={it.icon}
-            variant={active === it.id ? 'tonal' : 'standard'}
-            aria-label={it.label}
-          ></mdui-button-icon>
+          <Icon name={it.icon} />
           <span className="bottom-nav__label">{it.label}</span>
         </button>
       ))}
@@ -29,5 +26,3 @@ function BottomNavigation({ active, onChange }: BottomNavigationProps) {
 }
 
 export default BottomNavigation
-
-

@@ -1,7 +1,9 @@
 import TagChip from './TagChip'
-import Icon from './Icon'
-import SvgIcon from './SvgIcon'
+import Card from '@/primitives/Card'
+import Button from '@/primitives/Button'
+import { renderSocialIcon } from '@/utils/socialIcon'
 import type { LinkItem } from '../content'
+import styles from './LinkCard.module.css'
 
 type LinkCardProps = {
   title: string
@@ -13,32 +15,30 @@ type LinkCardProps = {
   links: LinkItem[]
 }
 
-function LinkCard({ title, description, role, contribution, cover, tags, links }: LinkCardProps) {
-  const renderLinkIcon = (href: string, fallback?: string) => {
-    const h = href.toLowerCase()
-    if (h.includes('bilibili.com')) return <SvgIcon file="bilibili.svg" slot="icon" />
-    if (h.includes('github.com')) return <SvgIcon file="github.svg" slot="icon" />
-    if (h.includes('youtube.com') || h.includes('youtu.be')) return <SvgIcon file="youtube.svg" slot="icon" />
-    return fallback ? <Icon name={fallback} slot="icon" /> : null
-  }
-
+export default function LinkCard({
+  title,
+  description,
+  role,
+  contribution,
+  cover,
+  tags,
+  links,
+}: LinkCardProps) {
   return (
-    <mdui-card className="link-card" variant="filled">
-      <div className="link-card__media">
+    <Card variant="filled" interactive className={styles.card}>
+      <div className={styles.media}>
         <img src={cover} alt={title} loading="lazy" />
       </div>
 
-      <div className="link-card__body">
-        <div className="link-card__header">
-          <div>
-            <h3 className="link-card__title">{title}</h3>
-            <p className="link-card__desc">{description}</p>
-            <p className="link-card__meta">担任 · {role}（在线营业）</p>
-          </div>
+      <div className={styles.body}>
+        <div>
+          <h3 className={styles.title}>{title}</h3>
+          <p className={styles.desc}>{description}</p>
+          <p className={styles.meta}>担任 · {role}（在线营业）</p>
         </div>
 
         {contribution?.length ? (
-          <ul className="link-card__list">
+          <ul className={styles.list}>
             {contribution.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -46,7 +46,7 @@ function LinkCard({ title, description, role, contribution, cover, tags, links }
         ) : null}
 
         {tags?.length ? (
-          <div className="link-card__tags">
+          <div className={styles.tags}>
             {tags.map((tag) => (
               <TagChip key={tag} label={tag} />
             ))}
@@ -55,24 +55,15 @@ function LinkCard({ title, description, role, contribution, cover, tags, links }
       </div>
 
       {links?.length ? (
-        <div className="link-card__actions">
+        <div className={styles.actions}>
           {links.map((link) => (
-            <mdui-button
-              key={link.label}
-              variant="tonal"
-              href={link.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {renderLinkIcon(link.href, link.icon)}
+            <Button key={link.label} variant="tonal" href={link.href} target="_blank" rel="noreferrer">
+              {renderSocialIcon(link.href, link.icon)}
               {link.label}
-            </mdui-button>
+            </Button>
           ))}
         </div>
       ) : null}
-    </mdui-card>
+    </Card>
   )
 }
-
-export default LinkCard
-

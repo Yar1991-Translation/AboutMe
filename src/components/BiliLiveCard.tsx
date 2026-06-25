@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import type { BiliLive } from '../services/bilibili'
 import SvgIcon from './SvgIcon'
+import Card from '@/primitives/Card'
+import Button from '@/primitives/Button'
+import styles from './BiliCard.module.css'
 
 type BiliLiveCardProps = {
   label: string
@@ -8,54 +11,53 @@ type BiliLiveCardProps = {
   live: BiliLive
 }
 
-function BiliLiveCard({ label, isFriend, live }: BiliLiveCardProps) {
+export default function BiliLiveCard({ label, isFriend, live }: BiliLiveCardProps) {
   const [showEmbed, setShowEmbed] = useState(false)
 
-  // B站直播嵌入 URL
   const embedUrl = live.roomid
     ? `https://live.bilibili.com/blackboard/live-activity-player.html?cid=${live.roomid}&quality=0&mute=1&autoplay=0`
     : null
 
   return (
-    <mdui-card className="bili-live" variant="outlined">
-      <div className="bili-live__head">
-        <div className="bili-live__title">
+    <Card variant="outlined" className={styles.liveCard}>
+      <div className={styles.liveHead}>
+        <div className={styles.liveTitle}>
           <SvgIcon file="bilibili.svg" size={18} />
-          <span className="bili-live__label">{label} · 直播</span>
-          {isFriend ? <mdui-chip className="bili-badge">朋友</mdui-chip> : null}
+          <span>{label} · 直播</span>
+          {isFriend ? <span className={styles.badge}>朋友</span> : null}
         </div>
         {live.url ? (
-          <mdui-button variant={live.liveStatus ? 'filled' : 'tonal'} href={live.url} target="_blank" rel="noreferrer">
+          <Button
+            variant={live.liveStatus ? 'filled' : 'tonal'}
+            href={live.url}
+            target="_blank"
+            rel="noreferrer"
+          >
             {live.liveStatus ? '正在直播' : '去直播间'}
-          </mdui-button>
+          </Button>
         ) : (
-          <span className="bili-live__disabled">未开通</span>
+          <span className={styles.liveDisabled}>未开通</span>
         )}
       </div>
 
-      <div className="bili-live__body">
-        <span className={`bili-dot ${live.liveStatus ? 'is-live' : ''}`}></span>
-        <span className="bili-live__text">{live.liveStatus ? (live.title || '直播中') : '未开播'}</span>
+      <div className={styles.liveBody}>
+        <span className={`${styles.liveDot} ${live.liveStatus ? styles.liveDotActive : ''}`} />
+        <span>{live.liveStatus ? (live.title || '直播中') : '未开播'}</span>
       </div>
 
-      {/* 正在直播时显示嵌入切换按钮和播放器 */}
       {live.liveStatus && embedUrl && (
-        <div className="bili-live__embed-section">
-          <mdui-button
-            className="bili-live__embed-toggle"
-            variant="text"
-            onClick={() => setShowEmbed(!showEmbed)}
-          >
+        <div className={styles.embedSection}>
+          <Button variant="text" onClick={() => setShowEmbed(!showEmbed)}>
             {showEmbed ? '收起直播' : '展开直播'}
-          </mdui-button>
+          </Button>
 
           {showEmbed && (
-            <div className="bili-live__embed">
+            <div className={styles.embed}>
               <iframe
                 src={embedUrl}
-                className="bili-live__iframe"
+                className={styles.iframe}
                 allowFullScreen
-                frameBorder="0"
+                frameBorder={0}
                 allow="autoplay; fullscreen"
                 referrerPolicy="no-referrer"
               />
@@ -63,10 +65,6 @@ function BiliLiveCard({ label, isFriend, live }: BiliLiveCardProps) {
           )}
         </div>
       )}
-    </mdui-card>
+    </Card>
   )
 }
-
-export default BiliLiveCard
-
-

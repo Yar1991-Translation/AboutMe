@@ -1,0 +1,138 @@
+/* ========== Hero 区域 ========== */
+.card {
+  padding: var(--space-xl);
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.hero {
+  display: flex;
+  gap: var(--space-xl);
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.text {
+  flex: 1 1 520px;
+  min-width: 320px;
+}
+
+.side {
+  flex: 0 1 520px;
+  min-width: 320px;
+  align-self: stretch;
+  display: flex;
+}
+
+.location {
+  margin: 0 0 var(--space-sm);
+  color: var(--md-sys-color-on-surface-variant);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+}
+
+.name {
+  margin: 0;
+  font-family: '思源黑体', sans-serif;
+  font-size: clamp(var(--text-4xl), 6vw, 56px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #8e7cff 0%, #6750a4 35%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.title {
+  margin: var(--space-sm) 0 0;
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  margin: var(--space-xs) 0 0;
+  font-family: '思源黑体', sans-serif;
+  color: rgb(var(--accent-600));
+  font-size: var(--text-base);
+  font-weight: 500;
+}
+
+.intro {
+  margin: var(--space-md) 0 0;
+  color: var(--md-sys-color-on-surface-variant);
+  line-height: 1.7;
+  max-width: 480px;
+}
+
+/* Hero 标签 */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-md);
+  background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
+  color: var(--md-sys-color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.tag:hover {
+  background-color: color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent);
+  transform: translateY(-1px);
+}
+
+.actions {
+  margin-top: var(--space-xl);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+/* 主按钮强调色 */
+.primaryBtn {
+  --md-filled-button-container-color: rgb(var(--accent-400));
+  --md-filled-button-label-text-color: rgb(var(--accent-on-rgb));
+}
+
+/* 响应式 */
+@media (max-width: 599px) {
+  .card {
+    padding: var(--space-lg);
+  }
+  .side {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .location {
+    font-size: var(--text-xs);
+  }
+  .intro {
+    max-width: 100%;
+  }
+  .tags {
+    gap: var(--space-xs);
+  }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag:hover {
+    transform: none;
+  }
+}

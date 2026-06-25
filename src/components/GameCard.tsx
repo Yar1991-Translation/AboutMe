@@ -1,5 +1,7 @@
-import Icon from './Icon'
 import SvgIcon from './SvgIcon'
+import Card from '@/primitives/Card'
+import Button from '@/primitives/Button'
+import styles from './GameCard.module.css'
 
 type GameCardProps = {
   title: string
@@ -10,41 +12,37 @@ type GameCardProps = {
   platform: 'steam' | 'roblox'
 }
 
-function GameCard({ title, cover, subtitle, link, linkLabel = '去康康', platform }: GameCardProps) {
+export default function GameCard({
+  title,
+  cover,
+  subtitle,
+  link,
+  linkLabel = '去康康',
+  platform,
+}: GameCardProps) {
   const platformSvg = platform === 'steam' ? 'steam.svg' : 'roblox.svg'
-  
+
   return (
-    <mdui-card className="game-card" variant="filled">
-      <div className="game-card__media">
+    <Card variant="filled" interactive className={styles.card}>
+      <div className={styles.media}>
         <img src={cover} alt={title} loading="lazy" />
       </div>
-      <div className="game-card__body">
-        <div className="game-card__header">
-          <span className="game-card__platform-icon">
+      <div className={styles.body}>
+        <div className={styles.header}>
+          <span className={styles.platformIcon}>
             <SvgIcon file={platformSvg} size={18} />
           </span>
-          <h4 className="game-card__title">{title}</h4>
+          <h4 className={styles.title}>{title}</h4>
         </div>
-        {subtitle && <p className="game-card__subtitle">{subtitle}</p>}
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       </div>
       {link && (
-        <div className="game-card__actions">
-          <mdui-button
-            variant="text"
-            href={link}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Icon name="open_in_new" slot="icon" />
+        <div className={styles.actions}>
+          <Button variant="text" href={link} target="_blank" rel="noreferrer" icon="open_in_new">
             {linkLabel}
-          </mdui-button>
+          </Button>
         </div>
       )}
-    </mdui-card>
+    </Card>
   )
 }
-
-export default GameCard
-
-
-

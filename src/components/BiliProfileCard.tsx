@@ -1,5 +1,8 @@
 import type { BiliProfile, BiliStats } from '../services/bilibili'
 import SvgIcon from './SvgIcon'
+import Card from '@/primitives/Card'
+import Button from '@/primitives/Button'
+import styles from './BiliCard.module.css'
 
 type BiliProfileCardProps = {
   label: string
@@ -8,46 +11,42 @@ type BiliProfileCardProps = {
   stats: BiliStats
 }
 
-function BiliProfileCard({ label, isFriend, profile, stats }: BiliProfileCardProps) {
+export default function BiliProfileCard({ label, isFriend, profile, stats }: BiliProfileCardProps) {
   return (
-    <mdui-card className="bili-profile" variant="elevated">
-      <div className="bili-profile__head">
-        <div className="bili-profile__title">
+    <Card variant="elevated" className={styles.profileCard}>
+      <div className={styles.profileHead}>
+        <div className={styles.profileTitle}>
           <SvgIcon file="bilibili.svg" size={18} />
-          <span className="bili-profile__label">{label}</span>
-          {isFriend ? <mdui-chip className="bili-badge">朋友</mdui-chip> : null}
+          <span>{label}</span>
+          {isFriend ? <span className={styles.badge}>朋友</span> : null}
         </div>
-        <mdui-button variant="text" href={`https://space.bilibili.com/${profile.mid}`} target="_blank" rel="noreferrer">
+        <Button variant="text" href={`https://space.bilibili.com/${profile.mid}`} target="_blank" rel="noreferrer">
           去空间
-        </mdui-button>
+        </Button>
       </div>
 
-      <div className="bili-profile__content">
+      <div className={styles.profileContent}>
         <img
-          className="bili-profile__avatar"
+          className={styles.avatar}
           src={profile.face || `${import.meta.env.BASE_URL}svgs/bilibili.svg`}
           alt={`${profile.name} 的头像`}
           loading="lazy"
           referrerPolicy="no-referrer"
           crossOrigin="anonymous"
         />
-        <div className="bili-profile__info">
-          <div className="bili-profile__nameRow">
-            <span className="bili-profile__name">{profile.name}</span>
-            <span className="bili-profile__mid">mid: {profile.mid}</span>
+        <div className={styles.profileInfo}>
+          <div className={styles.nameRow}>
+            <span className={styles.name}>{profile.name}</span>
+            <span className={styles.mid}>mid: {profile.mid}</span>
           </div>
-          {profile.sign ? <p className="bili-profile__sign">{profile.sign}</p> : null}
-          <div className="bili-profile__stats">
-            <span className="bili-pill">粉丝 {stats.follower}</span>
-            <span className="bili-pill">关注 {stats.following}</span>
-            <span className="bili-pill">获赞 {stats.likes}</span>
+          {profile.sign ? <p className={styles.sign}>{profile.sign}</p> : null}
+          <div className={styles.stats}>
+            <span className={styles.pill}>粉丝 {stats.follower}</span>
+            <span className={styles.pill}>关注 {stats.following}</span>
+            <span className={styles.pill}>获赞 {stats.likes}</span>
           </div>
         </div>
       </div>
-    </mdui-card>
+    </Card>
   )
 }
-
-export default BiliProfileCard
-
-

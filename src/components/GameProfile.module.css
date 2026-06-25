@@ -1,0 +1,129 @@
+/* Roblox + Minecraft 共用 profile 卡片样式 */
+.card {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.content {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: flex-start;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-xl);
+  object-fit: cover;
+  background-color: var(--md-sys-color-surface-container-high);
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.name {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--md-sys-color-on-surface);
+  margin: 0;
+}
+
+.handle {
+  font-size: var(--text-sm);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.uuid {
+  margin: var(--space-xs) 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.uuid code {
+  font-family: 'Roboto Mono', monospace;
+  font-size: var(--text-xs);
+}
+
+.uuidLabel {
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+/* Minecraft 3D 头渲染区 */
+.mcRender {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mcHead {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* 响应式 */
+@media (max-width: 599px) {
+  .content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .titleRow {
+    justify-content: center;
+  }
+  .pills {
+    justify-content: center;
+  }
+  .actions {
+    justify-content: center;
+  }
+}

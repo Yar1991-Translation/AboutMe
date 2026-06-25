@@ -1,0 +1,10 @@
+/* 季节配色选择器 */
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.btn {
+  flex-shrink: 0;
+}

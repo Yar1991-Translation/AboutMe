@@ -1,6 +1,10 @@
+import type { ReactNode } from 'react'
+import { motion } from 'motion/react'
 import Icon from './Icon'
 import SvgIcon from './SvgIcon'
-import type { ReactNode } from 'react'
+import Card from '@/primitives/Card'
+import Button from '@/primitives/Button'
+import styles from './Hero.module.css'
 
 type HeroProps = {
   name: string
@@ -14,7 +18,15 @@ type HeroProps = {
   side?: ReactNode
 }
 
-function Hero({
+const renderSocialIcon = (href: string, fallback?: string) => {
+  const h = href.toLowerCase()
+  if (h.includes('bilibili.com')) return <SvgIcon file="bilibili.svg" />
+  if (h.includes('github.com')) return <SvgIcon file="github.svg" />
+  if (h.includes('youtube.com') || h.includes('youtu.be')) return <SvgIcon file="youtube.svg" />
+  return fallback ? <Icon name={fallback} /> : null
+}
+
+export default function Hero({
   name,
   title,
   subtitle,
@@ -25,64 +37,77 @@ function Hero({
   secondaryAction,
   side,
 }: HeroProps) {
-  const renderSocialIcon = (href: string, fallback?: string) => {
-    const h = href.toLowerCase()
-    if (h.includes('bilibili.com')) return <SvgIcon file="bilibili.svg" slot="icon" />
-    if (h.includes('github.com')) return <SvgIcon file="github.svg" slot="icon" />
-    if (h.includes('youtube.com') || h.includes('youtu.be')) return <SvgIcon file="youtube.svg" slot="icon" />
-    return fallback ? <Icon name={fallback} slot="icon" /> : null
-  }
-
   return (
-    <mdui-card className="hero-card" variant="elevated">
-      <div className="hero">
-        <div className="hero-text">
-          <p className="location">
+    <Card variant="elevated" className={styles.card}>
+      <div className={styles.hero}>
+        <div className={styles.text}>
+          <p className={styles.location}>
             <Icon name="location_on" style={{ fontSize: '1.1em' }} />
             {location}
           </p>
-          <h1 className="hero-name">{name}</h1>
-          <h3 className="hero-title">{title}</h3>
-          {subtitle && <p className="hero-subtitle">{subtitle}</p>}
-          <p className="hero-intro">{intro}</p>
-          
+
+          <motion.h1
+            className={styles.name}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
+          >
+            {name}
+          </motion.h1>
+
+          <h3 className={styles.title}>{title}</h3>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+          <p className={styles.intro}>{intro}</p>
+
           {tags && tags.length > 0 && (
-            <div className="hero-tags">
+            <motion.div
+              className={styles.tags}
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+            >
               {tags.map((tag) => (
-                <span key={tag} className="hero-tag">{tag}</span>
+                <motion.span
+                  key={tag}
+                  className={styles.tag}
+                  variants={{
+                    hidden: { opacity: 0, y: 8 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                >
+                  {tag}
+                </motion.span>
               ))}
-            </div>
+            </motion.div>
           )}
-          
-          <div className="hero-actions">
-            <mdui-button
+
+          <motion.div
+            className={styles.actions}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+          >
+            <Button
               variant="filled"
               href={primaryAction.href}
               target="_blank"
               rel="noreferrer"
-              className="hero-btn-primary"
+              className={styles.primaryBtn}
             >
               {renderSocialIcon(primaryAction.href, primaryAction.icon)}
               {primaryAction.label}
-            </mdui-button>
+            </Button>
             {secondaryAction && (
-              <mdui-button
-                variant="outlined"
-                href={secondaryAction.href}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <Button variant="outlined" href={secondaryAction.href} target="_blank" rel="noreferrer">
                 {renderSocialIcon(secondaryAction.href, secondaryAction.icon)}
                 {secondaryAction.label}
-              </mdui-button>
+              </Button>
             )}
-          </div>
+          </motion.div>
         </div>
-        {side ? <div className="hero-side">{side}</div> : null}
+
+        {side ? <div className={styles.side}>{side}</div> : null}
       </div>
-    </mdui-card>
+    </Card>
   )
 }
-
-export default Hero
-

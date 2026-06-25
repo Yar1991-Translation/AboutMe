@@ -1,10 +1,9 @@
+import styles from './TagChip.module.css'
+
 type TagChipProps = {
   label: string
 }
 
-function TagChip({ label }: TagChipProps) {
-  return <mdui-chip className="tag-chip">{label}</mdui-chip>
+export default function TagChip({ label }: TagChipProps) {
+  return <span className={styles.chip}>{label}</span>
 }
-
-export default TagChip
-

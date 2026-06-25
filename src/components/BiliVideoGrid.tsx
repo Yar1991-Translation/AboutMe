@@ -1,33 +1,30 @@
 import type { BiliVideoItem } from '../services/bilibili'
+import Card from '@/primitives/Card'
+import { formatShortDate } from '@/utils/date'
+import styles from './BiliCard.module.css'
 
 type BiliVideoGridProps = {
   title: string
   items: BiliVideoItem[]
 }
 
-const fmtDate = (ms: number) => {
-  if (!ms) return ''
-  const d = new Date(ms)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-function BiliVideoGrid({ title, items }: BiliVideoGridProps) {
+export default function BiliVideoGrid({ title, items }: BiliVideoGridProps) {
   return (
-    <mdui-card className="bili-videos" variant="outlined">
-      <div className="bili-videos__head">
-        <h3 className="bili-videos__title">{title}</h3>
+    <Card variant="outlined" className={styles.videoCard}>
+      <div className={styles.videoHead}>
+        <h3 className={styles.videoTitle}>{title}</h3>
       </div>
       {items.length ? (
-        <div className="bili-videos__grid">
+        <div className={styles.videoGrid}>
           {items.map((v) => (
-            <a key={v.bvid} className="bili-video" href={v.url} target="_blank" rel="noreferrer">
-              <div className="bili-video__cover">
+            <a key={v.bvid} className={styles.videoItem} href={v.url} target="_blank" rel="noreferrer">
+              <div className={styles.videoCover}>
                 <img src={v.cover} alt={v.title} loading="lazy" referrerPolicy="no-referrer" crossOrigin="anonymous" />
               </div>
-              <div className="bili-video__body">
-                <div className="bili-video__title">{v.title}</div>
-                <div className="bili-video__meta">
-                  <span>{fmtDate(v.created)}</span>
+              <div className={styles.videoBody}>
+                <div className={styles.videoItemTitle}>{v.title}</div>
+                <div className={styles.videoMeta}>
+                  <span>{formatShortDate(v.created)}</span>
                   <span>播放 {v.play}</span>
                   <span>弹幕 {v.danmaku}</span>
                 </div>
@@ -36,12 +33,8 @@ function BiliVideoGrid({ title, items }: BiliVideoGridProps) {
           ))}
         </div>
       ) : (
-        <div className="bili-videos__empty">暂无视频</div>
+        <div className={styles.videoEmpty}>暂无视频</div>
       )}
-    </mdui-card>
+    </Card>
   )
 }
-
-export default BiliVideoGrid
-
-
