@@ -24,7 +24,7 @@ import styles from './HomePage.module.css'
 const BiliSection = lazy(() => import('../sections/BiliSection'))
 
 const emptyFallback = (
-  <Section title="B站动态" subtitle="我和朋友们的 B站更新（由 Vercel 代理拉取）。">
+  <Section title="B站动态" subtitle="我和朋友们的 B站更新（由 Vercel 代理拉取）。" index="04">
     <EmptyState icon="hourglass_empty" text="B站动态加载中…" />
   </Section>
 )
@@ -83,6 +83,7 @@ export default function HomePage() {
 
   return (
     <>
+      {/* 01 — Hero */}
       <Hero
         {...content.hero}
         side={
@@ -110,10 +111,12 @@ export default function HomePage() {
         }
       />
 
-      <Section title="快速入口" subtitle="先把常用的放这儿，省得你翻翻翻。">
+      {/* 02 — 快速入口 */}
+      <Section title="快速入口" subtitle="先把常用的放这儿，省得你翻翻翻。" index="02">
         <ContactBar contacts={content.contacts} variant="tonal" />
       </Section>
 
+      {/* 03 — B站动态 */}
       <div ref={biliRef}>
         <Suspense fallback={emptyFallback}>
           <BiliSection
@@ -128,9 +131,11 @@ export default function HomePage() {
         </Suspense>
       </div>
 
+      {/* 04 — 精选仓库 */}
       <Section
         title={Object.keys(githubReposConfig.allowList ?? {}).some((k) => githubReposConfig.allowList[k]) ? '精选仓库' : '仓库速览'}
         subtitle="置顶优先；没置顶就按「看起来最像精选」的来。"
+        index="04"
         actions={
           <Button variant="text" onClick={() => navigate('/repos')}>
             去仓库页
@@ -150,9 +155,11 @@ export default function HomePage() {
         )}
       </Section>
 
+      {/* 05 — 最近在玩 */}
       <Section
         title="最近在玩"
         subtitle="Steam Top N（按抓取顺序）。"
+        index="05"
         actions={
           <Button variant="text" onClick={() => navigate('/games')}>
             去游戏页

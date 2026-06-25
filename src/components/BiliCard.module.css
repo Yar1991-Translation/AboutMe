@@ -1,9 +1,9 @@
 /* ========== Bili Profile Card ========== */
 .profileCard {
-  padding: var(--space-lg);
+  padding: var(--space-xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .profileHead {
@@ -17,22 +17,25 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--text-base);
+  color: var(--md-sys-color-on-surface, #0f172a);
 }
 
 .badge {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 2px 10px;
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
+  font-weight: 600;
+  background: rgba(6, 182, 212, 0.12);
+  color: #0891b2;
+  border: 1px solid rgba(6, 182, 212, 0.2);
 }
 
 .profileContent {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
   align-items: flex-start;
 }
 
@@ -41,8 +44,9 @@
   height: 72px;
   border-radius: var(--radius-xl);
   object-fit: cover;
-  background-color: var(--md-sys-color-surface-container-high);
+  background: #e2e8f0;
   flex-shrink: 0;
+  border: 2px solid rgba(245, 158, 11, 0.2);
 }
 
 .profileInfo {
@@ -62,18 +66,19 @@
 .name {
   font-weight: 700;
   font-size: var(--text-lg);
-  color: var(--md-sys-color-on-surface);
+  color: var(--md-sys-color-on-surface, #0f172a);
 }
 
 .mid {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--md-sys-color-on-surface-variant);
+  color: #94a3b8;
 }
 
 .sign {
   margin: 0;
   font-size: var(--text-sm);
-  color: var(--md-sys-color-on-surface-variant);
+  color: #64748b;
   line-height: 1.5;
 }
 
@@ -84,20 +89,22 @@
 }
 
 .pill {
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  background: var(--md-sys-color-surface-container-high);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  color: var(--md-sys-color-on-surface-variant);
+  font-weight: 600;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
 }
 
 /* ========== Bili Video Grid ========== */
 .videoCard {
-  padding: var(--space-lg);
+  padding: var(--space-xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .videoHead {
@@ -108,15 +115,16 @@
 
 .videoTitle {
   margin: 0;
+  font-family: var(--font-display);
   font-size: var(--text-xl);
-  font-weight: 600;
-  color: var(--md-sys-color-on-surface);
+  font-weight: 400;
+  color: var(--md-sys-color-on-surface, #0f172a);
 }
 
 .videoGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .videoItem {
@@ -124,16 +132,16 @@
   flex-direction: column;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--md-sys-color-surface-container);
+  background: #f8f7f4;
   text-decoration: none;
   color: inherit;
-  transition: transform var(--duration-base) var(--ease-out),
+  transition: transform var(--duration-base) var(--ease-spring),
     box-shadow var(--duration-base) var(--ease-out);
 }
 
 .videoItem:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-lg);
 }
 
 .videoCover {
@@ -145,7 +153,12 @@
   aspect-ratio: 16 / 9;
   object-fit: cover;
   display: block;
-  background-color: var(--md-sys-color-surface-container-high);
+  background: #e2e8f0;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.videoItem:hover .videoCover img {
+  transform: scale(1.04);
 }
 
 .videoBody {
@@ -157,8 +170,8 @@
 
 .videoItemTitle {
   font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--md-sys-color-on-surface);
+  font-weight: 600;
+  color: #0f172a;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -169,23 +182,24 @@
 .videoMeta {
   display: flex;
   gap: var(--space-sm);
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--md-sys-color-on-surface-variant);
+  color: #94a3b8;
 }
 
 .videoEmpty {
-  padding: var(--space-xl);
+  padding: var(--space-2xl);
   text-align: center;
-  color: var(--md-sys-color-on-surface-variant);
+  color: #94a3b8;
   font-size: var(--text-sm);
 }
 
 /* ========== Bili Live Card ========== */
 .liveCard {
-  padding: var(--space-lg);
+  padding: var(--space-xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .liveHead {
@@ -199,13 +213,13 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--text-base);
 }
 
 .liveDisabled {
   font-size: var(--text-sm);
-  color: var(--md-sys-color-on-surface-variant);
+  color: #94a3b8;
 }
 
 .liveBody {
@@ -213,27 +227,27 @@
   align-items: center;
   gap: var(--space-sm);
   font-size: var(--text-sm);
-  color: var(--md-sys-color-on-surface-variant);
+  color: #64748b;
 }
 
 .liveDot {
   width: 10px;
   height: 10px;
   border-radius: var(--radius-full);
-  background: var(--md-sys-color-outline);
+  background: #cbd5e1;
   flex-shrink: 0;
   transition: background var(--duration-base) var(--ease-in-out);
 }
 
 .liveDotActive {
-  background: rgb(var(--color-success));
-  box-shadow: 0 0 6px rgba(var(--color-success), 0.5);
+  background: #f43f5e;
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.5);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.4; }
 }
 
 .embedSection {
@@ -246,7 +260,7 @@
   border-radius: var(--radius-md);
   overflow: hidden;
   aspect-ratio: 16 / 9;
-  background: var(--md-sys-color-surface-container);
+  background: #0f172a;
 }
 
 .iframe {
@@ -255,8 +269,23 @@
   border: none;
 }
 
+/* 响应式 */
+@media (max-width: 599px) {
+  .profileContent {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .stats {
+    justify-content: center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .videoItem:hover {
+    transform: none;
+  }
+  .videoItem:hover .videoCover img {
     transform: none;
   }
   .liveDotActive {

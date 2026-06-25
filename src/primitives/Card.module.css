@@ -1,37 +1,57 @@
+/* ========== MD3 卡片 —— 字幕/电影主题 ========== */
 .card {
   position: relative;
   border-radius: var(--radius-lg);
-  color: var(--md-sys-color-on-surface);
-  transition: box-shadow var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-emphasized),
-    background-color var(--duration-base) var(--ease-in-out);
+  color: var(--md-sys-color-on-surface, #0f172a);
+  transition:
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-spring),
+    background-color var(--duration-base) var(--ease-in-out),
+    border-color var(--duration-base) var(--ease-in-out);
 }
 
 .elevated {
-  background-color: var(--md-sys-color-surface-container-low);
-  box-shadow: var(--shadow-1);
+  background-color: var(--md-sys-color-surface-container-low, #f8f7f4);
+  box-shadow: var(--shadow-sm);
 }
 
 .filled {
-  background-color: var(--md-sys-color-surface-container-highest);
+  background-color: var(--md-sys-color-surface-container-highest, #f0ece4);
 }
 
 .outlined {
-  background-color: var(--md-sys-color-surface);
-  border: 1px solid var(--md-sys-color-outline-variant);
+  background-color: var(--md-sys-color-surface, #faf8f5);
+  border: 1px solid var(--md-sys-color-outline-variant, #e2e0dc);
 }
 
+/* hover 交互 —— 微抬升 + 左侧琥珀色 accent */
 .interactive {
   cursor: default;
 }
 
 .interactive:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-3);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
 }
 
-.elevated.interactive:hover {
-  box-shadow: var(--shadow-3);
+.interactive.elevated:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 左侧 accent 边框（仅 interactive 卡片） */
+.interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  background: #f59e0b;
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.interactive:hover::before {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {

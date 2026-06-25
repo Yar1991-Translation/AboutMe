@@ -1,0 +1,12 @@
+/* B站动态区块 */
+.channels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.channel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}

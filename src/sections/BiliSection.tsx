@@ -1,9 +1,10 @@
 import Section from '../components/Section'
-import Icon from '../components/Icon'
+import EmptyState from '@/primitives/EmptyState'
 import BiliProfileCard from '../components/BiliProfileCard'
 import BiliVideoGrid from '../components/BiliVideoGrid'
 import { bilibiliConfig } from '../config/bilibili'
 import type { BiliProfile, BiliStats, BiliVideoItem } from '../services/bilibili'
+import styles from './BiliSection.module.css'
 
 type BiliSectionProps = {
   loading: boolean
@@ -15,26 +16,17 @@ type BiliSectionProps = {
   pinned: Record<number, { items: BiliVideoItem[] } | null>
 }
 
-function BiliSection({ loading, error, hasRequested, profiles, stats, latest, pinned }: BiliSectionProps) {
+export default function BiliSection({ loading, error, hasRequested, profiles, stats, latest, pinned }: BiliSectionProps) {
   return (
-    <Section title="B站动态" subtitle="我和朋友们的 B站更新（由 Vercel 代理拉取）。">
+    <Section title="B站动态" subtitle="我和朋友们的 B站更新（由 Vercel 代理拉取）。" index="03">
       {!hasRequested ? (
-        <div className="empty-state">
-          <Icon name="hourglass_empty" className="empty-state__icon" />
-          <p className="empty-state__text">B站数据准备中…</p>
-        </div>
+        <EmptyState icon="hourglass_empty" text="B站数据准备中…" />
       ) : loading ? (
-        <div className="empty-state">
-          <Icon name="schedule" className="empty-state__icon" />
-          <p className="empty-state__text">正在拉取 B站数据…</p>
-        </div>
+        <EmptyState icon="schedule" text="正在拉取 B站数据…" />
       ) : error ? (
-        <div className="empty-state">
-          <Icon name="warning" className="empty-state__icon" />
-          <p className="empty-state__text">B站数据加载失败：{error}</p>
-        </div>
+        <EmptyState icon="warning" text={`B站数据加载失败：${error}`} />
       ) : (
-        <div className="bili-section">
+        <div className={styles.channels}>
           {bilibiliConfig.channels.map((c) => {
             const p = profiles[c.mid]
             const s = stats[c.mid]
@@ -42,7 +34,7 @@ function BiliSection({ loading, error, hasRequested, profiles, stats, latest, pi
             const pinnedItems = pinned[c.mid]?.items ?? []
 
             return (
-              <div key={c.mid} className="bili-channel">
+              <div key={c.mid} className={styles.channel}>
                 {p && s ? <BiliProfileCard label={c.label} isFriend={c.isFriend} profile={p} stats={s} /> : null}
                 {pinnedItems.length ? <BiliVideoGrid title="置顶/精选" items={pinnedItems} /> : null}
                 <BiliVideoGrid title="最新视频" items={latestItems} />
@@ -54,5 +46,3 @@ function BiliSection({ loading, error, hasRequested, profiles, stats, latest, pi
     </Section>
   )
 }
-
-export default BiliSection
