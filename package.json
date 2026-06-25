@@ -9,7 +9,7 @@
     "fetch-games": "node scripts/fetch-games.js",
     "fetch-subs-repos": "node scripts/fetch-subs-repos.js",
     "prebuild": "node scripts/prebuild.js",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/prebuild.js && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist -b gh-pages"
@@ -17,7 +17,6 @@
   "dependencies": {
     "@material/material-color-utilities": "^0.4.0",
     "@material/web": "^2.4.1",
-    "mdui": "^2.1.4",
     "motion": "^12.41.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

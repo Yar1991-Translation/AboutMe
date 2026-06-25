@@ -59,20 +59,6 @@ md-icon {
   --md-icon-font: 'Material Symbols Rounded';
 }
 
-/* 过渡期：强制 mdui 组件也使用本地图标字体（组件迁移完成后可删） */
-mdui-icon,
-mdui-icon::part(icon),
-mdui-button-icon::part(icon),
-[class*='material-symbols'] {
-  font-family: 'Material Symbols Rounded' !important;
-  font-variation-settings: 'FILL' var(--icon-fill, 0), 'wght' var(--icon-weight, 400),
-    'GRAD' var(--icon-grad, 0), 'opsz' var(--icon-opsz, 24) !important;
-}
-
-:root {
-  --mdui-icon-font-family: 'Material Symbols Rounded';
-}
-
 /* SVG 蒙版图标：用 currentColor 上色，便于跟随主题 */
 .svg-mask-icon {
   display: inline-block;
