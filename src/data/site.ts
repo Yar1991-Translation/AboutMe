@@ -1,7 +1,7 @@
 export const site = {
   name: 'Yatmt',
   title: '字幕翻译 / 游戏玩家 / 偶尔写点代码',
-  description: '在 B 站做字幕。也打游戏，偶尔写点小工具。',
+  description: 'TmV2ZXIgc2F5IGdvb2RiZXk=',
   url: 'https://about.yatmt.site',
   /** the card link previews render — brand plate, not a portrait */
   ogImage: '/og.png',

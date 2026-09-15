@@ -19,7 +19,10 @@ const {
 } = Astro.props
 
 const canonicalURL = new URL(Astro.url.pathname, site.url)
-const fullTitle = title === site.name ? `${title} — ARCHIVE` : `${title} | ${site.name}`
+// The tab title is the page's own name and nothing else. The old
+// `Page | Yatmt` / `Yatmt — ARCHIVE` suffixes were noise in a tab bar that is
+// already showing the favicon, and they pushed the part that actually
+// identifies the page out of the visible width.
 const path = Astro.url.pathname
 
 const nav = [
@@ -39,19 +42,19 @@ const nav = [
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
-    <title>{fullTitle}</title>
+    <title>{title}</title>
     <meta name="description" content={description} />
 
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:title" content={fullTitle} />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(image, site.url)} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="zh_CN" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(image, site.url)} />
 
