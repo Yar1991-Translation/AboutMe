@@ -1,0 +1,114 @@
+---
+interface Props {
+  fig?: string
+  label?: string
+  /** Depth plane. Negative lags behind the scroll, positive leads it. */
+  depth?: number
+}
+
+const { fig = 'FIG. A1', label = 'Subject / Unidentified', depth = -0.8 } = Astro.props
+---
+
+<!--
+  A specimen plate with no photograph in it. The subject is not pictured —
+  only the apparatus pointed at it. Same DOM shape as FigurePlate (`.plate` >
+  overlay + frame + caption) so the existing plate reveal and hover styles
+  apply unchanged.
+-->
+<div class="plate plate--specimen" data-depth={depth}>
+  <div class="plate-surface" aria-hidden="true"></div>
+
+  <svg
+    class="plate-overlay"
+    viewBox="0 0 400 500"
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-label="Abstract blueprint specimen plate: registration marks, an alignment target and measurement brackets"
+  >
+    <!-- Registration marks, one per corner — the print-layer language -->
+    <g class="plate-reg">
+      {[
+        [26, 26],
+        [374, 26],
+        [26, 474],
+        [374, 474],
+      ].map(([cx, cy]) => (
+        <g>
+          <circle cx={cx} cy={cy} r="7" class="plate-line" fill="none" />
+          <line x1={cx - 12} y1={cy} x2={cx + 12} y2={cy} class="plate-line" />
+          <line x1={cx} y1={cy - 12} x2={cx} y2={cy + 12} class="plate-line" />
+        </g>
+      ))}
+    </g>
+
+    <!-- Alignment target: concentric squares, the inner one rotated off-axis -->
+    <g class="plate-target">
+      <rect x="110" y="160" width="180" height="180" class="plate-line" fill="none" />
+      <rect x="135" y="185" width="130" height="130" class="plate-line" fill="none" />
+      <rect
+        x="152"
+        y="202"
+        width="96"
+        height="96"
+        class="plate-line"
+        fill="none"
+        transform="rotate(12 200 250)"
+      />
+      <circle cx="200" cy="250" r="54" class="plate-line" fill="none" />
+      <circle cx="200" cy="250" r="3.5" class="plate-node--blue" />
+    </g>
+
+    <!-- Crosshair through the target -->
+    <line x1="200" y1="120" x2="200" y2="380" class="plate-line-soft" />
+    <line x1="70" y1="250" x2="330" y2="250" class="plate-line-soft" />
+
+    <!-- The one deliberate misregistration: a Klein Blue diagonal that does not
+         pass through the centre, plus a single small triangle sitting off the
+         grid. One accent, not several — the plate should read as cold. -->
+    <line x1="58" y1="392" x2="286" y2="96" class="plate-diagonal" />
+    <polygon points="336,132 362,166 310,166" class="plate-triangle" />
+
+    <!-- Measurement bracket, left edge -->
+    <g class="plate-measure">
+      <line x1="46" y1="160" x2="46" y2="340" class="plate-line" />
+      <line x1="40" y1="160" x2="52" y2="160" class="plate-line" />
+      <line x1="40" y1="340" x2="52" y2="340" class="plate-line" />
+      <line x1="46" y1="205" x2="52" y2="205" class="plate-line-soft" />
+      <line x1="46" y1="250" x2="52" y2="250" class="plate-line-soft" />
+      <line x1="46" y1="295" x2="52" y2="295" class="plate-line-soft" />
+    </g>
+
+    <!-- Measurement bracket, top edge -->
+    <g class="plate-measure">
+      <line x1="110" y1="130" x2="290" y2="130" class="plate-line" />
+      <line x1="110" y1="124" x2="110" y2="136" class="plate-line" />
+      <line x1="290" y1="124" x2="290" y2="136" class="plate-line" />
+    </g>
+
+    <!-- Square nodes -->
+    <rect x="104" y="154" width="5" height="5" class="plate-node" />
+    <rect x="284" y="154" width="5" height="5" class="plate-node" />
+    <rect x="104" y="334" width="5" height="5" class="plate-node" />
+    <rect x="284" y="334" width="5" height="5" class="plate-node" />
+
+    <!-- Klein Blue markers -->
+    <circle cx="86" cy="128" r="3" class="plate-node--blue" />
+    <circle cx="318" cy="404" r="3" class="plate-node--blue" />
+
+    <!-- Klein Blue wave, floated by GSAP via the wrapper -->
+    <g class="plate-wave-float">
+      <path
+        d="M 0 428 Q 60 410, 100 420 T 200 415 T 300 425 T 400 420 L 400 452 Q 300 458, 200 448 T 100 452 T 0 444 Z"
+        class="plate-wave"
+        opacity="0.85"
+      />
+    </g>
+  </svg>
+
+  <div class="plate-frame"></div>
+
+  <div class="plate-caption">
+    <span>{fig}</span>
+    <span>{label}</span>
+  </div>
+</div>

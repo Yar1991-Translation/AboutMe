@@ -1,0 +1,54 @@
+---
+interface Props {
+  text: string
+  x?: number
+  y?: number
+  rotation?: number
+}
+
+const { text, x = 0, y = 0, rotation = 0 } = Astro.props
+---
+
+<div
+  class="annotation"
+  style={`transform: translate(${x}px, ${y}px) rotate(${rotation}deg);`}
+>
+  <div class="annotation-line"></div>
+  <div class="annotation-node"></div>
+  <span class="annotation-text">{text}</span>
+</div>
+
+<style>
+  .annotation {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .annotation-line {
+    width: 24px;
+    height: 1px;
+    background: var(--ink);
+    opacity: 0.6;
+  }
+
+  .annotation-node {
+    width: 4px;
+    height: 4px;
+    background: var(--blue);
+    flex-shrink: 0;
+  }
+
+  .annotation-text {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.75;
+    white-space: nowrap;
+  }
+</style>

@@ -1,24 +1,18 @@
-﻿---
-import { getCollection } from 'astro:content'
+---
 import PostLayout from '../../layouts/PostLayout.astro'
-import { sortPostsByDate, getReadingTime } from '../../lib/utils'
+import { getCollection } from 'astro:content'
 
 export async function getStaticPaths() {
-  const allPosts = await getCollection('blog')
-  const posts = sortPostsByDate(allPosts)
-  
-  return posts.map((post, index) => ({
+  // Drafts were getting a live page at a guessable URL while every listing and
+  // the RSS feed hid them.
+  const posts = (await getCollection('blog')).filter((post) => !post.data.draft)
+  return posts.map((post) => ({
     params: { slug: post.slug },
-    props: {
-      post,
-      prevPost: index > 0 ? posts[index - 1] : undefined,
-      nextPost: index < posts.length - 1 ? posts[index + 1] : undefined,
-    },
+    props: { post },
   }))
 }
 
-const { post, prevPost, nextPost } = Astro.props
-const readingTime = getReadingTime(post.body)
+const { post } = Astro.props
 ---
 
-<PostLayout post={post} prevPost={prevPost} nextPost={nextPost} readingTime={readingTime} />
+<PostLayout post={post} />

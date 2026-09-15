@@ -1,78 +1,154 @@
 ---
 import BaseLayout from './BaseLayout.astro'
-import type { CollectionEntry } from 'astro:content'
+import GeometricFrame from '../components/GeometricFrame.astro'
+import WaveDecoration from '../components/WaveDecoration.astro'
+import { getCollection, type CollectionEntry } from 'astro:content'
+import { sortPostsByDate, getLength } from '../lib/utils'
 
 interface Props {
   post: CollectionEntry<'blog'>
-  prevPost?: CollectionEntry<'blog'>
-  nextPost?: CollectionEntry<'blog'>
-  readingTime: number
 }
 
-const { post, prevPost, nextPost, readingTime } = Astro.props
+const { post } = Astro.props
 const { title, description, date, tags } = post.data
 const { Content, headings } = await post.render()
 
-const tocHeadings = headings.filter((h) => h.depth <= 3)
+// `getCollection` rather than `Astro.glob`: the glob only matched `.md`, so any
+// `.mdx` post silently dropped out of the prev/next chain, and it skipped the
+// draft filter that every other listing applies. Sorted newest-first.
+const allEntries = sortPostsByDate(await getCollection('blog'))
+
+const currentIndex = allEntries.findIndex((p) => p.slug === post.slug)
+// Newest-first order, so a HIGHER index is the OLDER post. The labels were
+// previously wired to the opposite direction.
+const older = currentIndex < allEntries.length - 1 ? allEntries[currentIndex + 1] : null
+const newer = currentIndex > 0 ? allEntries[currentIndex - 1] : null
+
+const length = getLength(post.body ?? '')
+
+// The footnote block is emitted as an <h2>Footnotes</h2> by remark-gfm; it is
+// not a section of the article and does not belong in the table of contents.
+const toc = headings.filter((h) => h.depth <= 3 && !/^footnotes?$/i.test(h.text.trim()))
 ---
 
 <BaseLayout title={title} description={description} type="article">
-  <article class="post fade-in">
-    <header class="post-header">
-      <h1>{title}</h1>
-      <div class="post-meta">
-        <time datetime={date.toISOString()}>
-          {date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
-        </time>
-        <span>·</span>
-        <span>{readingTime} 分钟阅读</span>
+  <div class="wrap">
+    <div class="detail">
+      {/* LEFT SIDEBAR — Metadata */}
+      <aside class="detail-aside detail-aside--left">
+        <div class="aside-block">
+          <div class="aside-label">Metadata</div>
+          <div class="aside-row">
+            <span class="k">Date</span>
+            <span class="v">{date.toISOString().slice(0, 10)}</span>
+          </div>
+          <div class="aside-row">
+            <span class="k">Type</span>
+            <span class="v">Note</span>
+          </div>
+        </div>
+
         {tags.length > 0 && (
-          <>
-            <span>·</span>
-            <span class="tag-list">
+          <div class="aside-block">
+            <div class="aside-label">Tags</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
               {tags.map((tag) => (
-                <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="tag">{tag}</a>
+                <span class="tag">{tag}</span>
               ))}
-            </span>
-          </>
+            </div>
+          </div>
         )}
-      </div>
-    </header>
+      </aside>
 
-    {tocHeadings.length > 2 && (
-      <nav class="toc" aria-label="目录">
-        <div class="toc-title">目录</div>
-        <ul>
-          {tocHeadings.map((heading) => (
-            <li class={heading.depth === 2 ? '' : 'toc-level-2'}>
-              <a href={`#${heading.slug}`}>{heading.text}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    )}
+      <article class="detail-main">
+        <div class="detail-header" style="position: relative;">
+          <div class="measure" style="margin-bottom: 20px;">
+            Note — {date.getFullYear()}
+          </div>
+          <h1 class="detail-title">{title}</h1>
+          <p class="detail-desc">{description}</p>
+          <GeometricFrame size="large" variant="cross" />
+        </div>
 
-    <div class="post-content">
-      <Content />
+        <div class="prose">
+          <Content />
+        </div>
+
+        {(older || newer) && (
+          <nav class="pn-nav" aria-label="上一篇/下一篇">
+            {older ? (
+              <a href={`/blog/${older.slug}`}>
+                <span class="pn-label">← Older</span>
+                <span>{older.data.title}</span>
+              </a>
+            ) : (
+              <div></div>
+            )}
+            {newer && (
+              <a href={`/blog/${newer.slug}`}>
+                <span class="pn-label">Newer →</span>
+                <span>{newer.data.title}</span>
+              </a>
+            )}
+          </nav>
+        )}
+      </article>
+
+      {/* RIGHT SIDEBAR — TOC & Notes */}
+      <aside class="detail-aside detail-aside--right">
+        {toc.length > 0 && (
+          <div class="aside-block">
+            <div class="aside-label">Contents</div>
+            <ul class="toc-list">
+              {toc.map((heading) => (
+                <li class={`lvl-${heading.depth}`}>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="aside-block">
+          <div class="infobox">
+            <div class="infobox-title">
+              <span>This Note</span>
+              <span class="fig">N—01</span>
+            </div>
+            <div class="infobox-row">
+              <span class="infobox-key">Length</span>
+              <span class="infobox-leader"></span>
+              <span class="infobox-val">{length.chars}</span>
+            </div>
+            <div class="infobox-row">
+              <span class="infobox-key">Read</span>
+              <span class="infobox-leader"></span>
+              <span class="infobox-val">≈{length.minutes} min</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="aside-block" style="position: relative;">
+          <WaveDecoration position="right" variant={2} />
+        </div>
+      </aside>
     </div>
-
-    {(prevPost || nextPost) && (
-      <nav class="post-nav">
-        {prevPost ? (
-          <a href={`/blog/${prevPost.slug}`} class="prev">
-            {prevPost.data.title}
-          </a>
-        ) : (
-          <span />
-        )}
-        {nextPost ? (
-          <a href={`/blog/${nextPost.slug}`} class="next">
-            {nextPost.data.title}
-          </a>
-        ) : (
-          <span />
-        )}
-      </nav>
-    )}
-  </article>
+  </div>
 </BaseLayout>
+
+<style>
+  .detail-header {
+    margin-bottom: 56px;
+  }
+
+  .btn--small {
+    padding: 8px 16px;
+    font-size: 10px;
+  }
+
+  @media (max-width: 960px) {
+    .detail-header {
+      margin-bottom: 40px;
+    }
+  }
+</style>

@@ -1,0 +1,52 @@
+---
+/**
+ * The site mark: the first letter of the handle, cut into three horizontal
+ * slices that never line up.
+ *
+ * Strokes are `currentColor` rather than the hardcoded ink of the favicon, so
+ * the same geometry reads on the paper theme and the dark theme without a
+ * second file. The middle slice is Klein Blue — one accent, same as everywhere
+ * else.
+ */
+interface Props {
+  class?: string
+}
+
+const { class: cls = '' } = Astro.props
+---
+
+<svg
+  class={cls}
+  viewBox="0 0 32 32"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <path
+      id="bm-y"
+      d="M6.5 6.5 L16 17.5 L25.5 6.5 M16 17.5 L16 26.5"
+      fill="none"
+      stroke-width="3.4"
+      stroke-linecap="butt"
+      stroke-linejoin="miter"></path>
+    <clipPath id="bm-top"><rect x="0" y="0" width="32" height="11"></rect></clipPath>
+    <clipPath id="bm-mid"><rect x="0" y="11" width="32" height="5.5"></rect></clipPath>
+    <clipPath id="bm-bot"><rect x="0" y="16.5" width="32" height="15.5"></rect></clipPath>
+  </defs>
+
+  <!-- Only the middle slice is displaced. Displacing all three broke the glyph
+       into loose fragments instead of reading as a misprint — a misprint only
+       reads because the rest of the plate is in register. -->
+  <g clip-path="url(#bm-top)">
+    <use href="#bm-y" x="-0.5" stroke="currentColor"></use>
+  </g>
+  <!-- inline style rather than a presentation attribute: `var()` inside an
+       SVG attribute is not reliably supported across engines -->
+  <g clip-path="url(#bm-mid)">
+    <use href="#bm-y" x="2.3" style="stroke: var(--blue)"></use>
+  </g>
+  <g clip-path="url(#bm-bot)">
+    <use href="#bm-y" x="-0.4" stroke="currentColor"></use>
+  </g>
+</svg>

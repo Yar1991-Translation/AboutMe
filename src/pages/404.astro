@@ -1,13 +1,35 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
+import GeometricFrame from '../components/GeometricFrame.astro'
 ---
 
-<BaseLayout title="页面未找到">
-  <div class="not-found fade-in">
-    <h1>404</h1>
-    <p>页面不存在或已被移除。</p>
-    <p>
-      <a href="/">返回首页</a>
-    </p>
+<BaseLayout title="404">
+  <div class="wrap">
+    <div class="notfound rise" style="position: relative;">
+      <p class="measure measure--arrow" style="margin-bottom: 24px;">Error — Missing Entry</p>
+      <h1 data-glitch style="position: relative; z-index: 10;">404</h1>
+      <p style="position: relative; z-index: 10;">
+        该条目不存在、已移除，或未曾归档。<br />
+        Entry does not exist in this archive.
+      </p>
+      <blockquote style="position: relative; z-index: 10; font-size: 11px; opacity: 0.6; margin: 24px 0; font-style: italic; max-width: 38ch;">
+        "少即是多。" — Ludwig Mies van der Rohe
+      </blockquote>
+      <a href="/" class="btn" data-glitch style="position: relative; z-index: 10;">Return to Index</a>
+
+      <!-- Dissociative geometric overlays -->
+      <div style="position: absolute; top: 20%; left: -50px; opacity: 0.3;">
+        <GeometricFrame size="large" variant="grid" />
+      </div>
+      <div style="position: absolute; bottom: 15%; right: -40px; opacity: 0.4;">
+        <GeometricFrame size="medium" variant="slice" />
+      </div>
+
+      <!-- Klein Blue broken lines -->
+      <div style="position: absolute; top: 35%; left: 0; width: 80px; height: 3px; background: var(--blue); opacity: 0.7;"></div>
+      <div style="position: absolute; top: 35%; left: 100px; width: 120px; height: 3px; background: var(--blue); opacity: 0.7;"></div>
+      <div style="position: absolute; bottom: 40%; right: 0; width: 60px; height: 3px; background: var(--blue); opacity: 0.7;"></div>
+      <div style="position: absolute; bottom: 40%; right: 80px; width: 100px; height: 3px; background: var(--blue); opacity: 0.7;"></div>
+    </div>
   </div>
 </BaseLayout>

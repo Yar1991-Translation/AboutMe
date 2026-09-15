@@ -1,0 +1,58 @@
+---
+interface Props {
+  position?: 'top' | 'bottom' | 'left' | 'right'
+  variant?: 1 | 2 | 3
+}
+
+const { position = 'bottom', variant = 1 } = Astro.props
+
+const waves = {
+  1: 'M 0 50 Q 100 30, 200 50 T 400 50 T 600 50 L 600 100 L 0 100 Z',
+  2: 'M 0 60 Q 80 40, 160 55 T 320 60 T 480 55 T 640 60 L 640 100 L 0 100 Z',
+  3: 'M 0 40 Q 120 20, 240 45 T 480 40 T 720 45 L 720 100 L 0 100 Z',
+}
+---
+
+<svg class={`wave-deco wave-deco--${position}`} viewBox="0 0 600 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d={waves[variant]} fill="var(--blue)" opacity="0.9" />
+</svg>
+
+<style>
+  .wave-deco {
+    position: absolute;
+    width: 100%;
+    height: 80px;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .wave-deco--bottom {
+    bottom: 0;
+    left: 0;
+  }
+
+  .wave-deco--top {
+    top: 0;
+    left: 0;
+    transform: scaleY(-1);
+  }
+
+  .wave-deco--left {
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 80px;
+    transform: rotate(90deg) translateX(-100%);
+    transform-origin: top left;
+  }
+
+  .wave-deco--right {
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 80px;
+    transform: rotate(-90deg) translateY(-100%);
+    transform-origin: top right;
+  }
+</style>

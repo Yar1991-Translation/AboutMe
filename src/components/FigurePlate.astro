@@ -1,0 +1,78 @@
+---
+interface Props {
+  src: string
+  alt: string
+  fig?: string
+  /** Depth plane. Negative lags behind the scroll, positive leads it.
+   *  Magnitude is relative, roughly -2..2. */
+  depth?: number
+}
+
+const { src, alt, fig = 'FIG. 01', depth = -0.8 } = Astro.props
+---
+
+<div class="plate" data-depth={depth}>
+  <img src={src} alt={alt} class="plate-img" />
+
+  <!-- Blueprint overlay SVG with grids, lines, nodes, Klein Blue wave and triangle -->
+  <svg class="plate-overlay" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+    <!-- Grid lines -->
+    <g class="plate-grid-lines">
+      {[...Array(17)].map((_, i) => (
+        <line x1={i * 25} y1="0" x2={i * 25} y2="500" class="plate-line-soft" />
+      ))}
+      {[...Array(21)].map((_, i) => (
+        <line x1="0" y1={i * 25} x2="400" y2={i * 25} class="plate-line-soft" />
+      ))}
+    </g>
+
+    <!-- Measurement lines -->
+    <line x1="30" y1="50" x2="30" y2="180" class="plate-line" />
+    <line x1="25" y1="50" x2="35" y2="50" class="plate-line" />
+    <line x1="25" y1="180" x2="35" y2="180" class="plate-line" />
+
+    <line x1="320" y1="350" x2="370" y2="350" class="plate-line" />
+    <line x1="370" y1="345" x2="370" y2="355" class="plate-line" />
+
+    <!-- Annotation arrows -->
+    <path d="M 50 430 L 120 430 L 115 426 M 120 430 L 115 434" class="plate-line" fill="none" />
+    <path d="M 350 80 L 350 140 L 346 135 M 350 140 L 354 135" class="plate-line" fill="none" />
+
+    <!-- Small square nodes -->
+    <rect x="28" y="48" width="4" height="4" class="plate-node" />
+    <rect x="28" y="178" width="4" height="4" class="plate-node" />
+    <rect x="368" y="348" width="4" height="4" class="plate-node" />
+    <rect x="118" y="428" width="4" height="4" class="plate-node" />
+    <rect x="348" y="78" width="4" height="4" class="plate-node" />
+
+    <!-- Klein Blue node markers -->
+    <circle cx="100" cy="100" r="3" class="plate-node--blue" />
+    <circle cx="320" cy="280" r="3" class="plate-node--blue" />
+    <circle cx="80" cy="420" r="3" class="plate-node--blue" />
+
+    <!-- Sharp geometric triangle (Klein Blue) -->
+    <polygon points="360,20 390,60 330,60" class="plate-triangle" />
+    <polygon points="40,480 70,500 40,500" class="plate-triangle" />
+
+    <!-- Klein Blue fluid wave.
+         The <g> wrapper carries GSAP's continuous float; the path itself
+         carries the CSS hover lift. Splitting them across two elements keeps
+         one writer per transform (see the ownership rule in global.css). -->
+    <g class="plate-wave-float">
+      <path
+        d="M 0 220 Q 60 200, 100 210 T 200 205 T 300 215 T 400 210 L 400 250 Q 300 255, 200 245 T 100 250 T 0 240 Z"
+        class="plate-wave"
+        opacity="0.85"
+      />
+    </g>
+  </svg>
+
+  <!-- Frame border -->
+  <div class="plate-frame"></div>
+
+  <!-- Caption label -->
+  <div class="plate-caption">
+    <span>{fig}</span>
+    <span>{alt}</span>
+  </div>
+</div>

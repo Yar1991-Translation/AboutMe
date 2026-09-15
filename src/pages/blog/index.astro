@@ -1,64 +1,161 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
+import GeometricFrame from '../../components/GeometricFrame.astro'
 import { getCollection } from 'astro:content'
-import { sortPostsByDate, getAllTags, filterPostsByTag, formatDate } from '../../lib/utils'
+import { sortPostsByDate, formatDate, getAllTags } from '../../lib/utils'
 
-const allPosts = await getCollection('blog')
-const sortedPosts = sortPostsByDate(allPosts)
+const allPosts = sortPostsByDate(await getCollection('blog'))
 const tags = getAllTags(allPosts)
-
-const urlTag = Astro.url.searchParams.get('tag')
-const posts = urlTag ? filterPostsByTag(sortedPosts, urlTag) : sortedPosts
+const years = [...new Set(allPosts.map((p) => p.data.date.getFullYear()))].sort((a, b) => b - a)
 ---
 
-<BaseLayout title="博客" description="所有文章列表">
-  <h1>博客</h1>
-  <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-    记录技术、生活和想法。
-  </p>
-
-  {tags.length > 0 && (
-    <div class="tag-filter" style="margin-bottom: 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-      <a href="/blog" class={`tag ${!urlTag ? 'active' : ''}`} style={!urlTag ? 'background: var(--accent); color: white; border-color: var(--accent);' : ''}>
-        全部
-      </a>
-      {tags.map((tag) => (
-        <a
-          href={`/blog?tag=${encodeURIComponent(tag)}`}
-          class={`tag ${urlTag === tag ? 'active' : ''}`}
-          style={urlTag === tag ? 'background: var(--accent); color: white; border-color: var(--accent);' : ''}
-        >
-          {tag}
-        </a>
-      ))}
-    </div>
-  )}
-
-  {posts.length > 0 ? (
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li class="post-list-item">
-          <h2 class="post-list-title">
-            <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-          </h2>
-          <div class="post-list-meta">
-            <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-            {post.data.tags.length > 0 && (
-              <>
-                <span>·</span>
-                {post.data.tags.map((tag) => (
-                  <a href={`/blog?tag=${encodeURIComponent(tag)}`} class="tag">{tag}</a>
-                ))}
-              </>
-            )}
+<BaseLayout title="Notes">
+  {/* ARCHIVE HEADER */}
+  <section class="archive-head">
+    <div class="wrap grid-12">
+      <div style="grid-column: 1 / span 8; position: relative;">
+        <div class="measure" style="margin-bottom: 20px;">Note Index</div>
+        <h1 class="archive-title rise" data-depth="1">Notes<span class="accent">.</span></h1>
+        <p class="archive-lead rise">
+          {allPosts.length > 0 ? `${allPosts.length} 条笔记。想法、记录、碎片。` : '归档为空。'}
+        </p>
+        <blockquote style="font-size: 11px; opacity: 0.7; margin-top: 20px; font-style: italic; max-width: 46ch;">
+          "不懂得外语的人，对自己的语言也一无所知。" — Johann Wolfgang von Goethe
+        </blockquote>
+        <GeometricFrame size="large" variant="grid" />
+      </div>
+      <div style="grid-column: 10 / span 3; align-self: end;">
+        <div class="infobox" style="margin-top: 40px;">
+          <div class="infobox-title">
+            <span>Archive Stats</span>
+            <span class="fig">DATA—02</span>
           </div>
-          <p class="post-list-excerpt">{post.data.description}</p>
-        </li>
-      ))}
-    </ul>
-  ) : (
-    <p style="color: var(--text-muted); text-align: center; padding: 3rem 0;">
-      暂无文章。
-    </p>
+          <div class="infobox-row">
+            <span class="infobox-key">Total</span>
+            <span class="infobox-leader"></span>
+            <span class="infobox-val">{allPosts.length}</span>
+          </div>
+          <div class="infobox-row">
+            <span class="infobox-key">Years</span>
+            <span class="infobox-leader"></span>
+            <span class="infobox-val">{years.length}</span>
+          </div>
+          <div class="infobox-row">
+            <span class="infobox-key">Tags</span>
+            <span class="infobox-leader"></span>
+            <span class="infobox-val">{tags.length}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* TAG FILTER — rendered only when there is something to filter.
+      These used to be `href="#tag-…"` anchors, and no element with that id
+      existed anywhere, so clicking one did nothing. They are plain markers
+      until there are enough posts to justify real filtering. */}
+  {tags.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>Keywords</h2>
+          <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. 01 — Index</span>
+        </div>
+        <div class="tag-cloud">
+          {tags.map((tag, i) => (
+            <span class={`tag ${i % 3 === 0 ? 'tag--solid' : ''}`}>{tag}</span>
+          ))}
+        </div>
+      </div>
+    </section>
   )}
+
+  {/* EMPTY STATE */}
+  {allPosts.length === 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>Entries</h2>
+          <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. 02 — Void</span>
+        </div>
+        <p class="measure" style="margin-bottom: 20px;">No entries on record</p>
+        <p class="small" style="line-height: 1.8; opacity: 0.75; max-width: 46ch;">
+          归档为空。写第一篇用 <code class="mono">npm run new:post "标题"</code>，
+          去掉 frontmatter 里的 <code class="mono">draft: true</code> 即可发布。
+        </p>
+      </div>
+    </section>
+  )}
+
+  {/* CHRONOLOGICAL LIST */}
+  {years.map((year) => {
+    const yearPosts = allPosts.filter((p) => p.data.date.getFullYear() === year)
+    return (
+      <section class="section">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>{year}</h2>
+            <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>{yearPosts.length} entries</span>
+          </div>
+          <ul class="rows">
+            {yearPosts.map((post) => (
+              <li>
+                <a href={`/blog/${post.slug}`} class="row-link">
+                  <span class="row-date">{formatDate(post.data.date)}</span>
+                  <span class="row-title">{post.data.title}</span>
+                  <span class="row-tag">NOTE</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  })}
+
+  {/* FOOTER NOTE */}
+  <section class="section">
+    <div class="wrap grid-12">
+      <div style="grid-column: 1 / span 6;">
+        <blockquote>
+          "对于不可言说之物，必须保持沉默。" — Ludwig Wittgenstein
+        </blockquote>
+      </div>
+      <div style="grid-column: 8 / span 5; align-self: center;">
+        <p class="small" style="line-height: 1.7; opacity: 0.8;">
+          发布之后不再改动。
+        </p>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .archive-head {
+    padding: 96px 0 80px;
+    border-bottom: 1px solid var(--ink);
+    position: relative;
+    /* no `overflow: hidden` here — it clipped the bleeding GeometricFrame.
+       The page-level `html { overflow-x: clip }` already contains the bleed. */
+  }
+
+  .archive-title {
+    font-size: var(--fs-display);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.88;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .archive-lead {
+    font-size: var(--fs-small);
+    line-height: 1.75;
+    max-width: 52ch;
+    opacity: 0.85;
+  }
+
+  @media (max-width: 960px) {
+    .archive-head { padding: 64px 0 56px; }
+  }
+</style>

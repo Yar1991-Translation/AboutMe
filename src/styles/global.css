@@ -1,644 +1,1537 @@
-/* ===== Design Tokens ===== */
-:root {
-  --font-serif: "Noto Serif SC", "Source Serif Pro", Georgia, serif;
-  --font-sans: "Noto Sans SC", "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+/* ============================================================
+   DISSOCIATIVE SURREALISM / NEW MINIMALISM
+   Swiss grid × blueprint aesthetics × Klein Blue
+   ============================================================ */
 
-  /* Light theme */
-  --bg: #faf9f7;
-  --bg-secondary: #f3f1ee;
-  --text: #1a1a1a;
-  --text-secondary: #666666;
-  --text-muted: #999999;
-  --border: #e5e2de;
-  --accent: #8b3a3a;
-  --accent-hover: #6d2e2e;
-  --code-bg: #f5f4f2;
-  --link: #8b3a3a;
-  --link-hover: #6d2e2e;
-  --selection: rgba(139, 58, 58, 0.15);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+:root {
+  --bg: #E8E6E1;
+  --ink: #111111;
+  /* `--blue` is International Klein Blue and owns every FILL, border, rule
+     and mark on the site. `--blue-ink` is the same hue tuned for use as
+     TEXT: true Klein Blue on the dark background measures 1.37:1, which is
+     not readable — so dark mode lightens it in place. Light mode is 11.4:1
+     and the two are identical there. */
+  --blue: #002FA7;
+  --blue-ink: #002FA7;
+  --line: rgba(17, 17, 17, 0.28);
+  --line-soft: rgba(17, 17, 17, 0.12);
+
+  --font-sans: "Inter", "Helvetica Neue", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SFMono-Regular", "JetBrains Mono", "IBM Plex Mono", Consolas, monospace;
+
+  /* 56–144px. The cap was 96px, which left a display title occupying barely
+     half of its 9-column span — the heading read as small and adrift rather
+     than as the anchor of the grid. */
+  --fs-display: clamp(3.5rem, 12.5vw, 9rem);
+  --fs-h1: clamp(2.5rem, 6vw, 4rem);
+  --fs-h2: clamp(1.5rem, 3.5vw, 2.25rem);
+  --fs-body: 0.8125rem;                     /* 13px */
+  --fs-small: 0.75rem;                      /* 12px */
+  --fs-micro: 0.6875rem;                    /* 11px */
+
+  --wrap: 1200px;
+  --gutter: 24px;
 }
 
 [data-theme="dark"] {
-  --bg: #1a1a1a;
-  --bg-secondary: #242424;
-  --text: #e8e6e3;
-  --text-secondary: #a8a5a0;
-  --text-muted: #6b6863;
-  --border: #333333;
-  --accent: #c4705a;
-  --accent-hover: #d4856e;
-  --code-bg: #252525;
-  --link: #c4705a;
-  --link-hover: #d4856e;
-  --selection: rgba(196, 112, 90, 0.25);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --bg: #111111;
+  --ink: #E8E6E1;
+  --blue: #002FA7;
+  /* same hue, lifted to ~6.2:1 against --bg */
+  --blue-ink: color-mix(in srgb, #002FA7 52%, #ffffff);
+  --line: rgba(232, 230, 225, 0.28);
+  --line-soft: rgba(232, 230, 225, 0.12);
 }
 
-/* ===== Reset & Base ===== */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ===== Reset ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
-  font-size: 16px;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* anchor / TOC targets must clear the 96px sticky header */
+  scroll-padding-top: 124px;
+  /* `clip` (not `hidden`) — it does not create a scroll container,
+     so `position: sticky` on .site-header keeps working */
+  overflow-x: clip;
 }
 
 body {
   font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.5;
   background: var(--bg);
-  color: var(--text);
-  line-height: 1.75;
-  transition: background 0.3s ease, color 0.3s ease;
+  color: var(--ink);
+  transition: background 0.25s ease, color 0.25s ease;
+  overflow-x: clip;
 }
 
-::selection {
-  background: var(--selection);
+/* paper/stone noise overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2000;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection { background: var(--blue); color: var(--bg); }
+
+/* ===== Focus =====
+   There was no focus styling anywhere on the site, and `.field input:focus`
+   removed the browser default outline without putting anything back — so a
+   keyboard user had no idea where they were. */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+/* fields sit flush against their own border, so keep the ring inside */
+.field input:focus-visible,
+.field textarea:focus-visible,
+.field select:focus-visible {
+  outline-offset: 0;
 }
 
 /* ===== Typography ===== */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--text);
+h1, h2, h3, h4 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-align: left;
 }
 
-h1 { font-size: 2.25rem; margin-bottom: 1rem; }
-h2 { font-size: 1.75rem; margin-top: 2.5rem; margin-bottom: 1rem; }
-h3 { font-size: 1.375rem; margin-top: 2rem; margin-bottom: 0.75rem; }
-h4 { font-size: 1.125rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-
-p {
-  margin-bottom: 1.25rem;
-  color: var(--text);
-}
+p { margin-bottom: 1em; max-width: 62ch; }
 
 a {
-  color: var(--link);
+  color: var(--blue-ink);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.15s ease;
 }
+a:hover { color: var(--blue-ink); }
 
-a:hover {
-  color: var(--link-hover);
-}
+strong { font-weight: 700; }
+em { font-style: italic; }
 
-strong {
-  font-weight: 600;
-}
+.mono { font-family: var(--font-mono); }
+.micro { font-size: var(--fs-micro); }
+.small { font-size: var(--fs-small); }
+.accent { color: var(--blue-ink); }
+.uppercase { text-transform: uppercase; letter-spacing: 0.12em; }
 
-em {
-  font-style: italic;
-}
-
-blockquote {
-  border-left: 3px solid var(--accent);
-  padding-left: 1.25rem;
-  margin: 1.5rem 0;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-code {
-  font-family: var(--font-mono);
-  font-size: 0.875em;
-  background: var(--code-bg);
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-}
-
-pre {
-  background: var(--code-bg);
-  padding: 1.25rem;
-  border-radius: 8px;
-  overflow-x: auto;
-  margin: 1.5rem 0;
-  border: 1px solid var(--border);
-}
-
-pre code {
-  background: none;
-  padding: 0;
-  font-size: 0.875rem;
-  line-height: 1.7;
-}
-
-ul, ol {
-  margin-bottom: 1.25rem;
-  padding-left: 1.5rem;
-}
-
-li {
-  margin-bottom: 0.5rem;
-  color: var(--text);
-}
-
-hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 2.5rem 0;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-/* ===== Layout ===== */
-.container {
-  max-width: 680px;
+/* ===== Layout primitives ===== */
+.wrap {
+  max-width: var(--wrap);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--gutter);
 }
 
-/* ===== Header ===== */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 0 var(--gutter);
+}
+
+.section { padding: 72px 0; }
+.section + .section { border-top: 1px solid var(--line); }
+
+/* section header — blueprint title block */
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 10px;
+  margin-bottom: 40px;
+}
+.sec-head h2 {
+  font-size: var(--fs-h2);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.sec-no {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+/* real element, not ::before — GSAP cannot animate pseudo-elements.
+   uses `top` rather than translateY so GSAP owns `transform` outright */
+.sec-no-dot {
+  display: inline-block;
+  position: relative;
+  top: -1px;
+  width: 8px; height: 8px;
+  background: var(--blue);
+  margin-right: 8px;
+}
+
+/* ===== Header / Nav ===== */
 .site-header {
-  border-bottom: 1px solid var(--border);
-  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--ink);
+  background: var(--bg);
   position: sticky;
   top: 0;
-  background: var(--bg);
   z-index: 100;
-  transition: background 0.3s ease;
+  transition: background 0.25s ease;
+  /* NOTE: no `backdrop-filter` / `filter` here. Those are grouping properties
+     and force `transform-style: flat`, which would kill the perspective
+     chain below. If a frosted header is wanted later, put the blur on a
+     dedicated absolutely-positioned child, never on this element. */
+  perspective: 1000px;
 }
-
 .header-inner {
   display: flex;
+  align-items: stretch;
   justify-content: space-between;
+  height: 96px;
+  /* without this the perspective above is flattened and every
+     translateZ on .nav-links li / .brand / .theme-toggle is invisible */
+  transform-style: preserve-3d;
+}
+.brand {
+  display: flex;
   align-items: center;
-}
-
-.site-title {
-  font-family: var(--font-serif);
+  gap: 12px;
+  font-weight: 900;
   font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-  text-decoration: none;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-transform: uppercase;
+  /* no left padding: the mark has to sit on the same column as the hero
+     heading underneath it, or the whole left edge reads as misaligned */
+  padding: 0 32px 0 0;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  transform-style: preserve-3d;
 }
 
-.site-title:hover {
-  color: var(--accent);
+/* the mark strokes are `currentColor`, so they follow the brand's colour —
+   including on hover, where the whole mark goes Klein Blue */
+.brand-mark {
+  display: block;
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+/* The wordmark is deliberately NOT sliced.
+   A banded version was tried and the two copies covered ~96% of the text, so
+   at 20px the brand simply read as solid Klein Blue with no visible slip —
+   the effect was doing nothing except recolouring the type. The mark carries
+   the misregistration; the wordmark stays ink and only turns blue on hover. */
+.brand-text {
+  display: inline-block;
+}
+
+.brand:hover {
+  color: var(--blue-ink);
+  transform: translateX(6px) translateZ(10px);
+}
+
+/* The `nav` element had NO rule at all, so although `.header-inner`'s
+   `align-items: stretch` made `nav` a full-height flex item, `.nav-links`
+   inside it is a block-level box whose height came from its content. The
+   result: the links were only ~20px tall click targets floating at the top of
+   a 96px bar, with a large dead strip underneath. Stretching `nav` through to
+   the list makes each link fill the bar. */
+.site-header nav {
+  display: flex;
+  align-items: stretch;
 }
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
   list-style: none;
-  align-items: center;
+  align-items: stretch;
+  transform-style: preserve-3d;
 }
+.nav-links li {
+  display: flex;
+  transform-style: preserve-3d;
+}
+.nav-links li:nth-child(1) { transform: translateZ(8px); }
+.nav-links li:nth-child(2) { transform: translateZ(5px); }
+.nav-links li:nth-child(3) { transform: translateZ(3px); }
+.nav-links li:nth-child(4) { transform: translateZ(0px); }
 
 .nav-links a {
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+  padding: 0 34px;
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border-left: 1px solid var(--line);
   position: relative;
-  transition: color 0.2s ease;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
 }
-
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--text);
+.nav-links a .nav-idx {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--blue-ink);
+  margin-right: 10px;
+  opacity: 0.6;
 }
-
-.nav-links a.active::after {
+.nav-links a::after {
   content: "";
   position: absolute;
-  bottom: -4px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 1px;
+  left: 0; bottom: 0;
+  width: 100%; height: 4px;
+  background: var(--blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-links a:hover {
+  background: rgba(0, 47, 167, 0.03);
+  transform: translateY(-3px) translateZ(15px);
+}
+.nav-links a:hover::after,
+.nav-links a.active::after { transform: scaleX(1); }
+.nav-links a.active {
+  color: var(--blue-ink);
+  background: rgba(0, 47, 167, 0.05);
 }
 
 .theme-toggle {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  transition: all 0.2s ease;
+  width: 88px;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--line);
+  cursor: pointer;
+  color: var(--ink);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  transform-style: preserve-3d;
 }
-
+.theme-sq {
+  width: 16px; height: 16px;
+  border: 1px solid var(--ink);
+  transition: background 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+.theme-toggle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  transform: translate(-50%, -50%) rotate(45deg);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-theme="dark"] .theme-sq {
+  background: var(--blue);
+  border-color: var(--blue-ink);
+}
 .theme-toggle:hover {
-  color: var(--text);
-  border-color: var(--text-secondary);
+  transform: translateZ(20px) rotateZ(5deg);
+}
+.theme-toggle:hover::before {
+  border-color: var(--blue-ink);
+  transform: translate(-50%, -50%) rotate(90deg) scale(1.1);
+}
+.theme-toggle:hover .theme-sq {
+  background: var(--blue);
+  border-color: var(--blue-ink);
 }
 
-/* ===== Main Content ===== */
-.site-main {
-  min-height: calc(100vh - 200px);
-  padding: 3rem 0;
-}
-
-/* ===== Footer ===== */
-.site-footer {
-  border-top: 1px solid var(--border);
-  padding: 2rem 0;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.site-footer a {
-  color: var(--text-secondary);
-}
-
-.site-footer a:hover {
-  color: var(--accent);
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 0.75rem;
-}
+/* Only exists below 960px — see the responsive block. */
+.nav-toggle { display: none; }
 
 /* ===== Hero ===== */
 .hero {
-  padding: 2rem 0 3rem;
+  padding: 80px 0 96px;
+  border-bottom: 1px solid var(--ink);
+  position: relative;
 }
-
-.hero-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 1.25rem;
-  border: 2px solid var(--border);
-}
-
-.hero h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.hero-subtitle {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.hero-location {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  margin-bottom: 1.25rem;
-}
-
-.hero-intro {
-  font-size: 1.0625rem;
-  color: var(--text);
-  max-width: 480px;
-  line-height: 1.7;
-}
-
-/* ===== Section ===== */
-.section {
-  margin-bottom: 3rem;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-/* ===== Cards ===== */
-.card-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem;
-  transition: all 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
-}
-
-.card-title {
-  font-family: var(--font-serif);
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.card-title a {
-  color: var(--text);
-}
-
-.card-title a:hover {
-  color: var(--accent);
-}
-
-.card-description {
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.75rem;
-}
-
-.card-meta {
+.hero-kicker {
+  grid-column: 1 / -1;
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
 }
+.hero-kicker::before { content: ""; width: 40px; height: 1px; background: var(--ink); }
+.hero-kicker::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.hero-title {
+  grid-column: 1 / span 9;
+  font-size: var(--fs-display);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  position: relative;
+  /* optical alignment for the left edge of a display capital — and, since it
+     is not a round number, a permanent sub-pixel offset from the column */
+  margin-left: -0.045em;
+}
+.hero-side {
+  grid-column: 10 / span 3;
+  align-self: end;
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  border-left: 1px solid var(--line);
+  padding-left: 16px;
+}
+.hero-side p { margin-bottom: 0.75em; }
+.hero-side .side-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--blue-ink);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.hero-meta {
+  grid-column: 1 / -1;
+  margin-top: 56px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+}
+.hero-meta span { display: flex; align-items: center; gap: 8px; }
+.hero-meta span::before { content: ""; width: 6px; height: 6px; border: 1px solid var(--ink); }
+.hero-meta span:first-child::before { background: var(--blue); border-color: var(--blue-ink); }
+
+/* ===== Figure plate — grayscale image × blueprint overlay ===== */
+.plate {
+  position: relative;
+  aspect-ratio: 4 / 5;
+}
+.plate-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.08);
+  display: block;
+}
+
+/* Specimen plate — no photograph. The subject is not pictured, only the
+   apparatus aimed at it. */
+.plate-surface {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.plate-diagonal {
+  stroke: var(--blue);
+  stroke-width: 1.5;
+  opacity: 0.85;
+}
+.plate-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.plate-grid-lines { opacity: 0.22; }
+.plate-line { stroke: var(--ink); stroke-width: 0.75; opacity: 0.7; }
+.plate-line-soft { stroke: var(--ink); stroke-width: 0.5; opacity: 0.4; }
+.plate-node { fill: none; stroke: var(--ink); stroke-width: 1; }
+.plate-node--blue { fill: var(--blue); stroke: none; }
+.plate-triangle { fill: var(--blue); }
+.plate-wave {
+  fill: var(--blue);
+  opacity: 0.9;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.plate:hover .plate-wave { transform: translateY(-10px); }
+.plate-frame {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--ink);
+  pointer-events: none;
+}
+.plate-caption {
+  position: absolute;
+  left: -12px;
+  bottom: -10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--bg);
+  border: 1px solid var(--ink);
+  padding: 6px 12px;
+  z-index: 2;
+}
+.plate-caption::before { content: ""; width: 8px; height: 8px; background: var(--blue); }
+
+/* floating measurement note */
+.measure {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.measure::before { content: ""; width: 36px; height: 1px; background: var(--ink); }
+.measure--arrow::after { content: "→"; color: var(--blue-ink); }
 
 /* ===== Tags ===== */
 .tag {
   display: inline-block;
-  font-size: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  background: var(--code-bg);
-  color: var(--text-secondary);
-  border-radius: 999px;
-  border: 1px solid var(--border);
-}
-
-/* ===== Post List ===== */
-.post-list {
-  list-style: none;
-}
-
-.post-list-item {
-  margin-bottom: 1.75rem;
-  padding-bottom: 1.75rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.post-list-item:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-.post-list-title {
-  font-family: var(--font-serif);
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.375rem;
-}
-
-.post-list-title a {
-  color: var(--text);
-}
-
-.post-list-title a:hover {
-  color: var(--accent);
-}
-
-.post-list-meta {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.post-list-excerpt {
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
+  padding: 2px 8px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--blue);
+  color: var(--blue-ink);
+  background: transparent;
   line-height: 1.6;
 }
-
-/* ===== Post Page ===== */
-.post-header {
-  margin-bottom: 2.5rem;
+.tag--solid {
+  background: var(--blue);
+  color: var(--bg);
 }
+a.tag:hover { background: var(--blue); color: var(--bg); }
 
-.post-header h1 {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
-  line-height: 1.3;
-}
-
-.post-meta {
-  font-size: 0.9375rem;
-  color: var(--text-muted);
+.tag-cloud {
   display: flex;
-  gap: 1rem;
-  align-items: center;
   flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: flex-start;
+}
+.tag-cloud .tag { font-size: 11px; padding: 4px 12px; }
+/* staggered misalignment via margin-top, NOT transform — GSAP's reveal writes
+   an inline transform here and would flatten these offsets */
+.tag-cloud .tag:nth-child(2n) { margin-top: 5px; }
+.tag-cloud .tag:nth-child(3n) { margin-top: -3px; }
+.tag-cloud .tag:nth-child(5n) { margin-top: 7px; }
+
+/* ===== Buttons ===== */
+.btn {
+  position: relative;
+  /* gives the wipe below a stacking context to sit inside, so `z-index: -1`
+     lands behind the label instead of behind the whole page */
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  padding: 12px 26px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  /* `transform` is deliberately absent — GSAP owns it (lift, press, judder).
+     Only the colour state belongs to CSS. */
+  transition: color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.post-content {
-  font-size: 1rem;
-  line-height: 1.8;
+/* The fill sweeps in from the left instead of switching on. A hard
+   `background` swap was most of what made the button feel mechanical. */
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
+}
+.btn:hover::before,
+.btn:focus-visible::before {
+  transform: scaleX(1);
+}
+.btn:hover,
+.btn:focus-visible {
+  color: #FFFFFF;
+  border-color: var(--blue-ink);
 }
 
-.post-content > * + * {
-  margin-top: 1.25rem;
+/* the arrow means "this moves you forward" — opt out on actions that don't */
+.btn::after {
+  content: "→";
+  font-family: var(--font-mono);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn:hover::after,
+.btn:focus-visible::after {
+  transform: translateX(5px);
+}
+.btn--flat::after { content: none; }
+
+/* Transmission pulse — a ring that leaves the button on click. Created and
+   animated by the interactions effect; GSAP owns its transform. */
+.btn-pulse {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--blue);
+  pointer-events: none;
 }
 
-.post-content h2,
-.post-content h3,
-.post-content h4 {
-  margin-top: 2.5rem;
+/* ===== Infobox — technical drawing style ===== */
+.infobox {
+  position: relative;
+  border: 1px solid var(--ink);
+  padding: 18px 18px 14px;
+  font-size: var(--fs-micro);
 }
-
-.post-nav {
+.infobox::before {
+  content: "";
+  position: absolute;
+  top: -5px; left: -5px;
+  width: 10px; height: 10px;
+  background: var(--blue);
+}
+.infobox-title {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border);
-  gap: 1rem;
+}
+.infobox-title .fig { font-family: var(--font-mono); color: var(--blue-ink); }
+.infobox-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 5px 0;
+}
+.infobox-key {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+.infobox-leader {
+  flex: 1;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  /* static offset via `top`, NOT transform — GSAP animates scaleX on this
+     element to draw the leader line in, and would overwrite the offset */
+  top: -3px;
+}
+.infobox-leader::after {
+  content: "";
+  position: absolute;
+  right: -1px; bottom: -2px;
+  width: 4px; height: 4px;
+  background: var(--blue);
+}
+.infobox-val { text-align: right; white-space: nowrap; }
+
+/* ===== Blockquote — broken Klein Blue line ===== */
+blockquote {
+  position: relative;
+  padding: 4px 0 4px 24px;
+  margin: 2rem 0;
+  font-size: var(--fs-small);
+  line-height: 1.7;
+  border: none;
+  font-style: normal;
+}
+blockquote::before,
+blockquote::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 5px;
+  background: var(--blue);
+}
+blockquote::before { top: 0; height: 52%; }
+blockquote::after { bottom: 6%; height: 26%; }
+
+/* The broken line sits at the quote's left padding edge. Quotes that zero
+   their padding (a centred display quote, for instance) would leave the two
+   bars stranded at the container edge, completely detached from the text. */
+blockquote.quote--plain {
+  padding: 0;
+  margin: 0;
+}
+blockquote.quote--plain::before,
+blockquote.quote--plain::after {
+  content: none;
 }
 
-.post-nav a {
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-}
-
-.post-nav a:hover {
-  color: var(--accent);
-}
-
-.post-nav .prev::before {
-  content: "← ";
-}
-
-.post-nav .next::after {
-  content: " →";
-}
-
-/* ===== TOC ===== */
-.toc {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem;
-  margin-bottom: 2rem;
-  font-size: 0.9375rem;
-}
-
-.toc-title {
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: var(--text);
-}
-
-.toc ul {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 0;
-}
-
-.toc li {
-  margin-bottom: 0.375rem;
-}
-
-.toc a {
-  color: var(--text-secondary);
-}
-
-.toc a:hover {
-  color: var(--accent);
-}
-
-.toc .toc-level-2 {
-  padding-left: 1rem;
-}
-
-/* ===== Contact ===== */
-.contact-grid {
+/* ===== Updates / list rows ===== */
+.rows { list-style: none; border-top: 1px solid var(--line); }
+.rows li {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: 120px 1fr auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-small);
+}
+.rows .row-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+.rows .row-title { color: var(--ink); transition: transform 0.2s ease, color 0.15s ease; }
+.rows a:hover .row-title { color: var(--blue-ink); transform: translateX(6px); }
+.rows .row-tag { font-family: var(--font-mono); font-size: 10px; color: var(--blue-ink); }
+
+/* Was `display: contents`, which lifted the link out of the box tree and, in
+   several browsers, out of the accessibility tree too — leaving the clickable
+   area as just the text rather than the row. Mirroring the parent grid on the
+   link itself keeps the layout identical and the link real. */
+.rows .row-link {
+  color: inherit;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 16px;
+  align-items: baseline;
 }
 
-.contact-item {
+/* ===== Detail page — three columns ===== */
+.detail {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) 250px;
+  gap: 48px;
+  padding: 72px 0;
+}
+.detail-aside {
+  font-size: var(--fs-micro);
+  align-self: start;
+  position: sticky;
+  top: 112px;
+}
+.detail-aside--left { border-right: 1px solid var(--line); padding-right: 24px; }
+.detail-aside--right { border-left: 1px solid var(--line); padding-left: 24px; }
+.aside-block { margin-bottom: 32px; }
+.aside-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  gap: 8px;
 }
-
-.contact-item:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
-}
-
-.contact-icon {
-  font-size: 1.5rem;
-  width: 40px;
-  height: 40px;
+.aside-label::before { content: ""; width: 12px; height: 1px; background: var(--blue); }
+.aside-row {
   display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.aside-row .k { opacity: 0.65; letter-spacing: 0.08em; text-transform: uppercase; }
+.aside-row .v { text-align: right; }
+
+.detail-main { min-width: 0; }
+.detail-title {
+  font-size: var(--fs-h1);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  margin-bottom: 20px;
+}
+.detail-desc {
+  font-size: var(--fs-small);
+  line-height: 1.7;
+  opacity: 0.85;
+  max-width: 52ch;
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--ink);
+}
+
+/* article body */
+.prose { font-size: var(--fs-body); line-height: 1.65; }
+.prose > * + * { margin-top: 1.1em; }
+.prose h2 {
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-top: 2.6em;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+.prose h2::before {
+  content: "";
+  position: absolute;
+  top: -1px; left: 0;
+  width: 40px; height: 1px;
+  background: var(--blue);
+}
+.prose h3 { font-size: 1.0625rem; font-weight: 700; margin-top: 2em; }
+.prose p { max-width: 68ch; margin-bottom: 0; }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose li { margin-bottom: 0.35em; }
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  border: 1px solid var(--line);
+  padding: 0.1em 0.35em;
+}
+.prose pre {
+  border: 1px solid var(--ink);
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-size: var(--fs-small);
+  line-height: 1.6;
+}
+.prose pre code { border: none; padding: 0; }
+.prose hr { border: none; border-top: 1px solid var(--line); margin: 2.5em 0; }
+.prose a { text-decoration: underline; text-underline-offset: 3px; }
+.prose img { max-width: 100%; filter: grayscale(1); border: 1px solid var(--ink); }
+
+/* --- Code block palette (shiki, `css-variables` theme) --------------------
+   Shiki emits `var(--astro-code-token-*)` and expects the site to define
+   them. Defining them here rather than shipping a stock theme means the code
+   stays inside the site's palette — ink for structure, Klein Blue for
+   keywords / strings / constants, exactly the hierarchy the rest of the page
+   uses — and the colours flip with the theme for free, because they are all
+   derived from `--ink` and `--blue`.
+
+   (Previously `theme: 'github-light'` baked `background-color:#fff` into every
+   `<pre>`, so the dark theme got a white box with dark text.) */
+:root {
+  --astro-code-color-text: var(--ink);
+  --astro-code-color-background: color-mix(in srgb, var(--ink) 3%, transparent);
+  --astro-code-token-comment: color-mix(in srgb, var(--ink) 45%, transparent);
+  --astro-code-token-punctuation: color-mix(in srgb, var(--ink) 62%, transparent);
+  --astro-code-token-parameter: var(--ink);
+  --astro-code-token-function: var(--ink);
+  --astro-code-token-keyword: var(--blue-ink);
+  --astro-code-token-constant: var(--blue-ink);
+  --astro-code-token-string: color-mix(in srgb, var(--blue) 78%, var(--ink));
+  --astro-code-token-string-expression: color-mix(in srgb, var(--blue) 78%, var(--ink));
+  --astro-code-token-link: var(--blue-ink);
+}
+
+.prose .astro-code {
+  position: relative;
+  padding-left: 52px;
+}
+/* gutter rule — the block reads as a plate rather than a pasted screenshot */
+.prose .astro-code::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 34px;
+  border-right: 1px solid var(--line);
+}
+
+/* --- Remaining Markdown surface -------------------------------------------
+   `.prose` styled only h2/h3, lists, inline code, pre, hr, a and img.
+   Everything below was falling through to browser defaults, which do not
+   exist in this design. */
+.prose h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 2.4em;
+}
+.prose h4 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-top: 1.9em;
+}
+.prose h5,
+.prose h6 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--blue-ink);
+  margin-top: 2em;
+}
+
+/* GFM tables */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--ink);
+  font-size: var(--fs-small);
+}
+.prose th,
+.prose td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.prose th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--ink);
+}
+.prose tbody tr:last-child td { border-bottom: none; }
+.prose th[align='center'], .prose td[align='center'] { text-align: center; }
+.prose th[align='right'], .prose td[align='right'] { text-align: right; }
+
+/* GFM task lists */
+.prose .contains-task-list { list-style: none; padding-left: 0; }
+.prose .task-list-item { display: flex; gap: 10px; align-items: flex-start; }
+.prose .task-list-item input[type='checkbox'] {
+  appearance: none;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  border: 1px solid var(--ink);
+}
+.prose .task-list-item input[type='checkbox']:checked {
+  background: var(--blue);
+  border-color: var(--blue-ink);
+}
+
+/* GFM footnotes */
+.prose sup a {
+  font-family: var(--font-mono);
+  font-size: 0.7em;
+  text-decoration: none;
+  border: 1px solid var(--line);
+  padding: 0 3px;
+  margin-left: 2px;
+}
+.prose sup a:hover { border-color: var(--blue-ink); }
+.prose .footnotes {
+  margin-top: 3.5em;
+  padding-top: 16px;
+  border-top: 1px solid var(--ink);
+  font-size: var(--fs-micro);
+}
+.prose .footnotes li { margin-bottom: 0.6em; }
+.prose .data-footnote-backref { text-decoration: none; margin-left: 4px; }
+
+/* inline HTML that survives the renderer */
+.prose kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  border: 1px solid var(--ink);
+  border-bottom-width: 2px;
+  padding: 1px 5px;
+}
+.prose details {
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+}
+.prose summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue-ink);
+}
+.prose details[open] summary { margin-bottom: 10px; }
+
+/* remark-gfm gives the footnote block a `<h2 class="sr-only">Footnotes</h2>`.
+   It has to stay in the accessibility tree — it labels the section — so it is
+   hidden visually rather than with `display: none`, which would remove it
+   from screen readers too. */
+.sr-only {
+  /* `!important` is the convention for a visually-hidden utility, and it is
+     load-bearing here: `.prose h2` (0,2,0) outranks a bare `.sr-only`
+     (0,1,0), so its `position: relative` was winning and the heading stayed
+     in flow — a 1px clipped box still occupying ~75px of the page. */
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* TOC */
+.toc-list { list-style: none; }
+.toc-list li { padding: 5px 0; border-bottom: 1px solid var(--line-soft); }
+.toc-list li.lvl-3 { padding-left: 16px; }
+.toc-list a {
+  color: var(--ink);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.04em;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.toc-list a::before { content: ""; width: 8px; height: 1px; background: var(--line); flex: none; }
+.toc-list a:hover { color: var(--blue-ink); }
+.toc-list a:hover::before { background: var(--blue); }
+
+/* prev / next */
+.pn-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--ink);
+  margin-top: 64px;
+}
+.pn-nav a {
+  display: block;
+  padding: 18px 20px;
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+.pn-nav a + a { border-left: 1px solid var(--ink); text-align: right; }
+.pn-nav .pn-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--blue-ink);
+  margin-bottom: 6px;
+}
+.pn-nav a:hover { background: var(--blue); color: #FFFFFF; }
+.pn-nav a:hover .pn-label { color: #FFFFFF; }
+
+/* ===== About ===== */
+.about-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0 var(--gutter); padding: 72px 0; }
+.about-figure { grid-column: 1 / span 5; }
+.about-body { grid-column: 7 / span 6; align-self: start; }
+.about-body .lead { font-size: 1.25rem; font-weight: 700; line-height: 1.4; margin-bottom: 28px; max-width: 34ch; }
+.about-body p { font-size: var(--fs-small); line-height: 1.7; margin-bottom: 1.2em; }
+
+/* ===== Form — admin/edit ===== */
+.form-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0 var(--gutter); padding: 72px 0; }
+.form-main { grid-column: 1 / span 7; }
+.form-side { grid-column: 9 / span 4; align-self: start; }
+
+.field { position: relative; margin-bottom: 32px; }
+.field::before {
+  content: "";
+  position: absolute;
+  top: 2px; left: -14px;
+  width: 6px; height: 6px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+.field:focus-within::before { background: var(--blue); }
+.field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  transition: color 0.15s ease;
+}
+.field:focus-within label { color: var(--blue-ink); }
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  padding: 12px 14px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  color: var(--ink);
+  appearance: none;
+}
+.field textarea { min-height: 160px; resize: vertical; line-height: 1.6; }
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--blue-ink);
+  box-shadow: none;
+}
+.field .hint {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.form-note {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  color: var(--blue-ink);
+  display: none;
+}
+.form-note.visible { display: block; }
+
+/* ===== Footer ===== */
+.site-footer { border-top: 1px solid var(--ink); }
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
   align-items: center;
-  justify-content: center;
-  background: var(--code-bg);
-  border-radius: 8px;
+  padding: 28px 0;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-
-.contact-label {
-  font-weight: 600;
-  color: var(--text);
-}
-
-.contact-value {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-/* ===== About Page ===== */
-.about-content {
-  font-size: 1rem;
-  line-height: 1.8;
-}
-
-.about-content p {
-  margin-bottom: 1.25rem;
-}
-
-.skill-tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
-}
+.footer-mid { font-family: var(--font-mono); font-size: 10px; opacity: 0.7; }
+.footer-links { display: flex; gap: 20px; justify-content: flex-end; list-style: none; }
+.footer-links a { color: var(--ink); position: relative; }
+.footer-links a:hover { color: var(--blue-ink); }
+.footer-links a::after { content: " ↗"; font-family: var(--font-mono); font-size: 9px; color: var(--blue-ink); }
 
 /* ===== 404 ===== */
-.not-found {
-  text-align: center;
-  padding: 4rem 0;
+.notfound { padding: 120px 0; }
+.notfound h1 {
+  font-size: clamp(6rem, 20vw, 14rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--blue-ink);
+}
+.notfound p { font-size: var(--fs-small); margin: 24px 0 40px; }
+
+/* Click-glitch is now a GSAP keyframe timeline — see
+   src/scripts/motion/effects/interactions.ts. It had to move because the CSS
+   keyframe animated `transform` on `.btn`, which the GSAP hover tween also
+   writes, and the keyframe silently won. */
+
+/* NOTE: no permanent `will-change` on parallax planes. The parallax effect
+   sets it on `onToggle` while a plane is on screen and clears it when it
+   leaves; a blanket stylesheet rule promoted every plane to its own
+   compositor layer for the entire session. */
+
+/* fade-in (restrained) — no-JS / pre-JS entrance only.
+   TRANSFORM OWNERSHIP: once GSAP is driving an element (scroll, pointer, timeline)
+   it owns `transform`. A CSS keyframe with `fill: both` would silently win over
+   GSAP's inline styles, so anything GSAP touches must opt out here. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rise { animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.rise[data-depth] { animation: none; }
+
+/* ===== DISSOCIATIVE EFFECTS ===== */
+
+/* Layered z-index misalignment */
+.layer-float {
+  position: relative;
+  z-index: 5;
+  transform: translateZ(10px);
 }
 
-.not-found h1 {
-  font-size: 4rem;
-  color: var(--accent);
-  margin-bottom: 1rem;
+.layer-sink {
+  position: relative;
+  z-index: 1;
+  transform: translateZ(-10px);
 }
 
-.not-found p {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
+/* Permanent misregistration — these elements are deliberately off-grid and
+   never snap back. Offsets are LAYOUT (top/left), so the ambient pass is free
+   to own `transform` for the slow wander on top. */
+.dissociate-1 {
+  position: relative;
+  top: -5px;
+  left: 8px;
+  rotate: 0.8deg;
+}
+
+.dissociate-2 {
+  position: relative;
+  top: 7px;
+  left: -6px;
+  rotate: -0.6deg;
+}
+
+/* Blueprint grid reveal on scroll */
+@keyframes grid-reveal {
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.grid-reveal { animation: grid-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Klein Blue line extension */
+.line-extend {
+  position: relative;
+}
+
+.line-extend::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: var(--blue);
+  bottom: 0;
+  left: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.line-extend:hover::after {
+  transform: scaleX(1);
+}
+
+/* Floating annotation nodes */
+.annotation-node {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--blue);
+  pointer-events: none;
+  animation: float-node 3s ease-in-out infinite;
+}
+
+@keyframes float-node {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(3px, -5px); }
+}
+
+/* Technical leader line */
+.leader-line {
+  position: relative;
+}
+
+.leader-line::before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 1px;
+  background: var(--line);
+  left: -50px;
+  top: 50%;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.leader-line:hover::before {
+  width: 48px;
+  background: var(--blue);
+}
+
+/* Chamfered corner reveal */
+.chamfer-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.chamfer-reveal::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 24px 24px 0;
+  border-color: transparent var(--blue) transparent transparent;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.chamfer-reveal:hover::after {
+  opacity: 1;
+}
+
+/* Misalignment offset (dissociative) — layout again, not transform, so the
+   drift pass can animate x/y without flattening the offset. `rotate` is a
+   separate property from `transform` and does not collide with it. */
+.offset-1 { position: relative; top: -3px; left: 5px; }
+.offset-2 { position: relative; top: 6px; left: -4px; }
+.offset-3 { position: relative; top: 2px; left: 7px; rotate: 0.5deg; }
+.offset-4 { position: relative; top: -4px; left: -6px; rotate: -0.4deg; }
+
+/* Hover line grid expansion */
+.expand-grid {
+  position: relative;
+}
+
+.expand-grid::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0;
+  transition: opacity 0.35s ease, inset 0.35s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.expand-grid:hover::before {
+  opacity: 0.4;
+  inset: -20px;
+}
+
+/* Scroll-triggered parallax layers */
+.parallax-layer-1 { transform: translateZ(0); will-change: transform; }
+.parallax-layer-2 { transform: translateZ(0); will-change: transform; }
+.parallax-layer-3 { transform: translateZ(0); will-change: transform; }
+
+/* GSAP animation helper classes */
+.char {
+  display: inline-block;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+}
+
+/* --- Dissect bands --------------------------------------------------------
+   The title is cut into three horizontal strips, each a Klein Blue copy of
+   the whole word clipped to its own band and pushed sideways. The offsets are
+   PERMANENT — even with the page completely still the strips do not register,
+   so the heading always looks like a misprint. `--vmag` (the shared scroll
+   velocity field) pulls them further apart while the page is moving, and they
+   settle back when it stops.
+
+   The strips are `aria-hidden` copies; the real text stays in the base layer,
+   so nothing is read twice by a screen reader. */
+.dissect-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  color: var(--blue-ink);
+  /* reveal fades these in; the class rule below releases them if it fails */
+  opacity: 0;
+}
+
+html.mr-reveal .dissect-band {
+  opacity: 0.92;
+}
+
+.dissect-band--0 {
+  clip-path: inset(0 0 66% 0);
+  transform: translate(calc(-0.03em + var(--vmag, 0) * -15px), -2px);
+}
+.dissect-band--1 {
+  clip-path: inset(33% 0 34% 0);
+  transform: translate(calc(0.045em + var(--vmag, 0) * 19px), 0);
+}
+.dissect-band--2 {
+  clip-path: inset(67% 0 0 0);
+  transform: translate(calc(-0.02em + var(--vmag, 0) * -11px), 2px);
+}
+
+/* Hover lift for buttons. `will-change` is applied on pointerenter and
+   released on pointerleave by the interactions effect — a permanent rule here
+   keeps every button on its own compositor layer for the whole session. */
+.btn {
+  transform-style: preserve-3d;
+}
+
+/* Enhanced hero with 3D perspective.
+   The chain must be unbroken: perspective only reaches an element if every
+   ancestor between them is preserve-3d. `.hero > .wrap.grid-12` sits in
+   between, so it has to carry the flag too — otherwise .char's rotationX/z
+   renders orthographically flat. */
+.hero {
+  perspective: 1500px;
+  transform-style: preserve-3d;
+}
+
+.hero > .wrap.grid-12 {
+  transform-style: preserve-3d;
+}
+
+.hero-title {
+  transform-style: preserve-3d;
+}
+
+/* Klein Blue pulse for nodes — TRANSFORM OWNERSHIP: GSAP's scroll-in reveal
+   targets exactly `.plate-node--blue` (scale + autoAlpha), so a CSS keyframe
+   here would silently override it. The pulse is re-added via GSAP in the
+   ambient pass instead. */
+@keyframes blue-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.15); }
+}
+
+/* Continuous floating motion for geometric overlays */
+@keyframes float-dissociate {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(8px, -12px) rotate(2deg); }
+  66% { transform: translate(-10px, 8px) rotate(-2deg); }
+}
+
+/* TRANSFORM OWNERSHIP: the float is driven by GSAP (it needs to combine with the
+   scroll entrance + per-frame drift, which a fixed CSS keyframe cannot do).
+   `animation` here would override every inline transform GSAP writes. */
+@media (prefers-reduced-motion: reduce) {
+  .plate-node--blue {
+    animation: none;
+  }
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 640px) {
-  h1 { font-size: 1.75rem; }
-  h2 { font-size: 1.5rem; }
-  
-  .nav-links {
-    gap: 1rem;
+@media (max-width: 960px) {
+  .grid-12 > *, .about-grid > *, .form-grid > * { grid-column: 1 / -1 !important; }
+
+  .hero { padding: 56px 0 72px; }
+  .hero-side { border-left: none; border-top: 1px solid var(--line); padding: 20px 0 0; margin-top: 32px; }
+
+  .detail { grid-template-columns: 1fr; gap: 40px; }
+  .detail-aside { position: static; }
+  .detail-aside--left { border-right: none; border-bottom: 1px solid var(--line); padding: 0 0 24px; order: 2; }
+  .detail-aside--right { border-left: none; border-top: 1px solid var(--line); padding: 24px 0 0; order: 3; }
+  .detail-main { order: 1; }
+
+  .about-figure { margin-bottom: 48px; max-width: 420px; }
+  .form-side { margin-top: 48px; }
+
+  .rows li { grid-template-columns: 90px 1fr; }
+  .rows .row-link { grid-template-columns: 90px 1fr; }
+  .rows .row-tag { display: none; }
+
+  .footer-inner { grid-template-columns: 1fr; gap: 12px; text-align: left; }
+  .footer-links { justify-content: flex-start; }
+
+  /* ── Mobile navigation ────────────────────────────────────────────────
+     Previously the header stacked into two rows and the nav became a
+     horizontally scrolling strip — awkward to hit and easy to miss. It is now
+     a single row with an explicit toggle that opens the same <ul> as a
+     full-screen blueprint index. Same markup, no duplicate nav to keep in
+     sync, and the active-state logic is shared with desktop. */
+  .site-header {
+    /* perspective makes this element a containing block for fixed-position
+       descendants — which would trap the full-screen overlay inside the
+       header bar. The 3D nav treatment is a desktop idea anyway. */
+    perspective: none;
   }
-  
-  .nav-links a {
-    font-size: 0.875rem;
+
+  .header-inner {
+    height: 64px;
+    flex-direction: row;
+    align-items: center;
+    transform-style: flat;
   }
-  
-  .hero h1 {
-    font-size: 1.75rem;
+
+  /* vertical padding keeps the brand a real touch target — without it the
+     link collapses to its 26px text height */
+  .brand { padding: 14px 0; font-size: 1.0625rem; }
+
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* comfortable touch target — the whole header row is 64px, and this
+       needs to stay well clear of the 44px minimum */
+    min-height: 44px;
+    padding: 14px 0 14px 18px;
+    background: none;
+    border: none;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
   }
-  
-  .post-nav {
+
+  .nav-toggle-bars {
+    display: flex;
     flex-direction: column;
+    gap: 4px;
+    width: 18px;
   }
-  
-  .container {
-    padding: 0 1.25rem;
+  .nav-toggle-bars i {
+    display: block;
+    height: 1px;
+    background: var(--blue);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
-}
+  body.nav-open .nav-toggle-bars i:first-child { transform: translateY(2.5px) rotate(45deg); }
+  body.nav-open .nav-toggle-bars i:last-child { transform: translateY(-2.5px) rotate(-45deg); }
 
-/* ===== Animations ===== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
+  .nav-links {
+    position: fixed;
+    inset: 0;
+    z-index: 150; /* above the header bar (100), below the HUD noise */
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    padding: 84px var(--gutter) 48px;
+    background: var(--bg);
+    overflow-y: auto;
+    transform: translateY(-100%);
+    visibility: hidden;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.5s;
+    transform-style: flat;
   }
-  to {
-    opacity: 1;
+  body.nav-open .nav-links {
     transform: translateY(0);
+    visibility: visible;
   }
-}
+  body.nav-open { overflow: hidden; }
 
-.fade-in {
-  animation: fadeIn 0.5s ease forwards;
+  .nav-links li {
+    width: 100%;
+    transform: none !important; /* drop the desktop translateZ layering */
+  }
+  .nav-links a {
+    width: 100%;
+    padding: 22px 0;
+    border-left: none;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+  }
+  .nav-links a::after { height: 2px; }
+  .nav-links a .nav-idx { font-size: 12px; margin-right: 14px; }
+
+  .theme-toggle {
+    width: 100%;
+    height: 64px;
+    border-left: none;
+    border-top: 1px solid var(--line);
+    margin-top: 24px;
+  }
+
+  /* The overlay is opaque and covers the viewport — a fixed HUD and a lagging
+     cursor reticle on top of it would just be noise. */
+  .hud, .reticle { display: none; }
+
+  .section { padding: 56px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -646,5 +1539,355 @@ img {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ==========================================================================
+   MOTION LAYER
+   --------------------------------------------------------------------------
+   TRANSFORM OWNERSHIP — the rule everything below obeys:
+
+     CSS owns `transform` only for element state that is driven by a class or
+     pseudo-class (:hover, :focus-visible, [data-theme]). GSAP owns `transform`
+     for everything driven by scroll, pointer position, or a timeline.
+
+     No element may be written to by both. A CSS `animation` with
+     `fill-mode: both` beats GSAP's inline styles, so a single keyframe on an
+     element GSAP also animates silently deletes that animation — which is
+     what was happening to `.geo-frame`, `.rise[data-parallax]`,
+     `.plate-node--blue`, `.infobox-leader` and `.tag-cloud .tag`.
+
+     Static offsets (a fixed 5px nudge, a 0.5deg tilt) are LAYOUT, not motion:
+     they are written with position/top/left, never `transform`.
+   ========================================================================== */
+
+/* --- Pre-JS state ---------------------------------------------------------
+   `js-motion` is set by a synchronous head script so nothing flashes before
+   the bundle arrives. The kernel adds `motion-ready` once every effect has
+   either applied its start state or failed — and a 3s watchdog in the head
+   drops `js-motion` entirely if the bundle never runs. */
+html.js-motion:not(.motion-ready) .rise {
+  opacity: 0;
+}
+
+/* --- Ghost / echo typography ---------------------------------------------- */
+.ghost-host {
+  position: relative;
+}
+
+.ghost-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  color: var(--blue-ink);
+  opacity: calc(var(--vint, 0) * 0.45);
+  transform: translateX(calc(var(--vmag, 0) * -13px));
+}
+
+.ghost-layer--2 {
+  opacity: calc(var(--vint, 0) * 0.24);
+  transform: translateX(calc(var(--vmag, 0) * -25px)) translateY(calc(var(--vmag, 0) * 3px));
+}
+
+/* Promote only while the page is actually moving. */
+html.is-scrolling .ghost-layer {
+  will-change: transform, opacity;
+}
+
+/* --- Broken grid ---------------------------------------------------------- */
+.grid-layer {
+  position: fixed;
+  inset: 0;
+  /* negative z-index paints above the page background and below all content */
+  z-index: -1;
+  pointer-events: none;
+  overflow: clip;
+}
+
+.grid-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line-soft);
+  opacity: 0.55;
+  /* `left` is set from the measured content grid in grid.ts */
+}
+
+.grid-rule--accent {
+  background: var(--blue);
+  opacity: 0.3;
+}
+
+/* one rule stops short — the plate is damaged */
+.grid-rule--short {
+  bottom: 34%;
+}
+
+/* one rule sits a few pixels off its column and never snaps back */
+.grid-rule--offset {
+  margin-left: 7px;
+}
+
+/* --- Instrument HUD ------------------------------------------------------- */
+.hud {
+  position: fixed;
+  inset: 0;
+  z-index: 90; /* below the sticky header (100) */
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  contain: layout paint;
+}
+
+.hud-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--ink);
+  opacity: 0.45;
+}
+.hud-corner--tl { top: 112px; left: 16px; border-right: none; border-bottom: none; }
+.hud-corner--tr { top: 112px; right: 16px; border-left: none; border-bottom: none; }
+.hud-corner--bl { bottom: 16px; left: 16px; border-right: none; border-top: none; }
+.hud-corner--br { bottom: 16px; right: 16px; border-left: none; border-top: none; }
+
+.hud-line {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.7;
+}
+.hud-line--t { top: 114px; left: 42px; }
+.hud-line--b { bottom: 18px; left: 42px; }
+.hud-line--r {
+  bottom: 18px;
+  right: 42px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.hud-brand { color: var(--blue-ink); }
+.hud-sep { opacity: 0.4; }
+.hud-section { color: var(--blue-ink); }
+.hud-size { opacity: 0.55; }
+
+.hud-rail {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 1px;
+  height: 120px;
+  margin-top: -60px;
+  background: var(--line);
+}
+.hud-rail-fill {
+  width: 1px;
+  height: 100%;
+  background: var(--blue);
+  transform: scaleY(var(--page-progress, 0));
+  transform-origin: top center;
+}
+
+.hud-velo {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  width: 120px;
+  height: 2px;
+  margin-left: -60px;
+  background: var(--line-soft);
+}
+.hud-velo-bar {
+  width: 100%;
+  height: 100%;
+  background: var(--blue);
+  transform: scaleX(0);
+}
+
+@media (max-width: 1100px) {
+  .hud-line--t, .hud-line--b, .hud-velo { display: none; }
+}
+
+/* --- Cursor reticle ------------------------------------------------------- */
+/* No rules here are load-bearing for keyboard users: the reticle is
+   `aria-hidden`, pointer-events: none, and never rendered on touch. */
+html.has-reticle,
+html.has-reticle *:not(input):not(textarea):not(select):not(option) {
+  cursor: none;
+}
+
+.reticle {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.reticle.is-visible { opacity: 1; }
+
+.reticle-ring,
+.reticle-cross {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+
+.reticle-ring {
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 1px solid var(--ink);
+  opacity: 0.5;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.reticle-axis {
+  position: absolute;
+  background: var(--blue);
+  opacity: 0.9;
+}
+.reticle-axis--x { left: -7px; top: 0; width: 14px; height: 1px; }
+.reticle-axis--y { top: -7px; left: 0; height: 14px; width: 1px; }
+
+.reticle-label {
+  position: fixed;
+  left: 22px;
+  top: 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue-ink);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.reticle.is-locked .reticle-ring {
+  transform: rotate(45deg) scale(0.62);
+  border-color: var(--blue-ink);
+  opacity: 0.95;
+}
+.reticle.is-locked .reticle-label { opacity: 1; }
+.reticle.is-down .reticle-ring { transform: rotate(45deg) scale(0.42); }
+
+/* --- Boot sequence -------------------------------------------------------- */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  pointer-events: none;
+}
+
+.intro-bands {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.intro-band {
+  flex: 1;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.intro-chrome {
+  position: absolute;
+  inset: 0;
+}
+
+.intro-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.7;
+}
+
+.intro-meta {
+  position: absolute;
+  top: 114px;
+  left: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.intro-brand { color: var(--blue-ink); font-size: 12px; }
+.intro-sub { opacity: 0.6; }
+
+.intro-count {
+  position: absolute;
+  bottom: 42px;
+  right: 42px;
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 12vw, 7rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Reading progress + TOC ----------------------------------------------- */
+.toc-list a {
+  transition: color 0.15s ease, transform 0.2s ease;
+}
+.toc-list a.is-current {
+  color: var(--blue-ink);
+  transform: translateX(4px);
+}
+
+/* --- Page transitions ------------------------------------------------------
+   Astro swaps the document with View Transitions. The default is a plain
+   cross-fade; these keyframes make the outgoing content drift up and the
+   incoming content settle down from below, so a navigation reads as the page
+   re-forming rather than a hard cut. The chrome (HUD, grid, reticle) is
+   rebuilt after the swap and does not participate. */
+::view-transition-old(root) {
+  animation: 240ms cubic-bezier(0.22, 1, 0.36, 1) both vt-out;
+}
+::view-transition-new(root) {
+  animation: 340ms cubic-bezier(0.22, 1, 0.36, 1) both vt-in;
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.996);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(1.004);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
   }
 }

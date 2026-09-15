@@ -1,0 +1,84 @@
+---
+interface Props {
+  size?: 'small' | 'medium' | 'large'
+  variant?: 'grid' | 'cross' | 'corners' | 'slice'
+}
+
+const { size = 'medium', variant = 'grid' } = Astro.props
+
+const sizeMap = {
+  small: { width: 120, height: 120 },
+  medium: { width: 200, height: 200 },
+  large: { width: 320, height: 320 },
+}
+
+const { width, height } = sizeMap[size]
+---
+
+<div class={`geo-frame geo-frame--${size} geo-frame--${variant}`}>
+  <svg class="geo-svg" viewBox={`0 0 ${width} ${height}`} xmlns="http://www.w3.org/2000/svg">
+    {variant === 'grid' && (
+      <g class="geo-grid">
+        {[...Array(Math.floor(width / 20) + 1)].map((_, i) => (
+          <line x1={i * 20} y1="0" x2={i * 20} y2={height} stroke="var(--line)" stroke-width="0.5" />
+        ))}
+        {[...Array(Math.floor(height / 20) + 1)].map((_, i) => (
+          <line x1="0" y1={i * 20} x2={width} y2={i * 20} stroke="var(--line)" stroke-width="0.5" />
+        ))}
+      </g>
+    )}
+
+    {variant === 'cross' && (
+      <g class="geo-cross">
+        <line x1={width / 2} y1="0" x2={width / 2} y2={height} stroke="var(--blue)" stroke-width="1" opacity="0.6" />
+        <line x1="0" y1={height / 2} x2={width} y2={height / 2} stroke="var(--blue)" stroke-width="1" opacity="0.6" />
+        <circle cx={width / 2} cy={height / 2} r="4" fill="var(--blue)" />
+      </g>
+    )}
+
+    {variant === 'corners' && (
+      <g class="geo-corners">
+        <path d="M 0 0 L 30 0 L 30 2 L 2 2 L 2 30 L 0 30 Z" fill="var(--blue)" />
+        <path d={`M ${width} 0 L ${width - 30} 0 L ${width - 30} 2 L ${width - 2} 2 L ${width - 2} 30 L ${width} 30 Z`} fill="var(--blue)" />
+        <path d={`M 0 ${height} L 30 ${height} L 30 ${height - 2} L 2 ${height - 2} L 2 ${height - 30} L 0 ${height - 30} Z`} fill="var(--blue)" />
+        <path d={`M ${width} ${height} L ${width - 30} ${height} L ${width - 30} ${height - 2} L ${width - 2} ${height - 2} L ${width - 2} ${height - 30} L ${width} ${height - 30} Z`} fill="var(--blue)" />
+      </g>
+    )}
+
+    {variant === 'slice' && (
+      <g class="geo-slice">
+        <line x1="0" y1="0" x2={width} y2={height} stroke="var(--blue)" stroke-width="2" opacity="0.8" />
+        <polygon points={`${width - 40},${height - 20} ${width},${height} ${width - 20},${height - 40}`} fill="var(--blue)" />
+        <polygon points={`20,40 0,0 40,20`} fill="var(--blue)" />
+      </g>
+    )}
+  </svg>
+</div>
+
+<style>
+  .geo-frame {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .geo-frame--small {
+    width: 120px;
+    height: 120px;
+  }
+
+  .geo-frame--medium {
+    width: 200px;
+    height: 200px;
+  }
+
+  .geo-frame--large {
+    width: 320px;
+    height: 320px;
+  }
+
+  .geo-svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>

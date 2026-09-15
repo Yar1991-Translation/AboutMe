@@ -1,31 +1,121 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
+import GeometricFrame from '../components/GeometricFrame.astro'
+import Annotation from '../components/Annotation.astro'
 import { site } from '../data/site'
-
-const icons: Record<string, string> = {
-  email: '✉️',
-  github: '🐙',
-  bilibili: '📺',
-  qq: '💬',
-  youtube: '▶️',
-}
 ---
 
-<BaseLayout title="联系" description="联系方式">
-  <h1>联系</h1>
-  <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-    合作、交流或闲聊都可以找我。
-  </p>
+<BaseLayout title="Contact" description="通讯表单">
+  <section class="hero">
+    <div class="wrap grid-12">
+      <div class="hero-kicker rise"><span>Contact — Transmission Form</span></div>
+      <h1 class="hero-title rise" data-depth="1">Signal<span class="accent">.</span></h1>
+      <div class="hero-side rise">
+        <span class="side-label">Form / 表单</span>
+        <blockquote style="font-size: 11px; opacity: 0.75; margin-top: 12px; font-style: italic;">
+          "译事三难：信、达、雅。" — 严复《天演论》译例言
+        </blockquote>
+      </div>
+    </div>
+  </section>
 
-  <div class="contact-grid">
-    {site.social.map((item) => (
-      <a href={item.href} class="contact-item" target={item.href.startsWith('mailto') ? '_self' : '_blank'} rel="noopener">
-        <div class="contact-icon">{icons[item.icon] || '🔗'}</div>
-        <div>
-          <div class="contact-label">{item.label}</div>
-          <div class="contact-value">{item.href.replace(/^mailto:/, '').replace(/^https?:\/\//, '')}</div>
+  <div class="wrap">
+    <div class="form-grid">
+      <div class="form-main rise" style="position: relative;">
+        <form id="signal-form" novalidate>
+          <div class="field">
+            <label for="f-name">Name / 称呼</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required />
+            <div class="hint">Field 01 — Required</div>
+          </div>
+
+          <div class="field">
+            <label for="f-topic">Topic / 主题</label>
+            <input id="f-topic" name="topic" type="text" placeholder="字幕合作 / 游戏 / 其他" required />
+            <div class="hint">Field 02 — Required</div>
+          </div>
+
+          <div class="field">
+            <label for="f-msg">Message / 正文</label>
+            <textarea id="f-msg" name="message" required></textarea>
+            <div class="hint">Field 03 — Plain text only</div>
+          </div>
+
+          <button type="submit" class="btn" data-glitch>Transmit</button>
+          <p class="form-note" id="form-note">→ 已在本地邮件客户端打开草稿。若未弹出，请直接发送邮件。</p>
+        </form>
+
+        <!-- Floating geometric annotations -->
+        <div style="position: absolute; top: 80px; right: -60px;">
+          <Annotation text="INPUT NODE" x={0} y={0} rotation={0} />
         </div>
-      </a>
-    ))}
+        <div style="position: absolute; top: 50%; left: -70px;">
+          <GeometricFrame size="small" variant="corners" />
+        </div>
+      </div>
+
+      <div class="form-side rise" style="position: relative;">
+        <div class="infobox" style="margin-bottom: 32px;">
+          <div class="infobox-title">
+            <span>Direct Channels</span>
+            <span class="fig">C—01</span>
+          </div>
+          {site.social.map((item) => (
+            <div class="infobox-row">
+              <span class="infobox-key">{item.label}</span>
+              <span class="infobox-leader"></span>
+              <span class="infobox-val">
+                <a href={item.href} target={item.href.startsWith('mailto') ? '_self' : '_blank'} rel="noopener">Open</a>
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <p class="measure measure--arrow" style="margin-bottom: 14px;">Protocol</p>
+        <p class="micro" style="line-height: 1.8; opacity: 0.75; max-width: 30ch;">
+          字幕合作请附上视频链接和交期。急事走 QQ。
+        </p>
+
+        <!-- Klein Blue diagonal slash -->
+        <div style="position: absolute; bottom: 40px; right: -30px; width: 2px; height: 80px; background: var(--blue); transform: rotate(25deg); opacity: 0.7;"></div>
+
+        <GeometricFrame size="medium" variant="cross" />
+      </div>
+    </div>
   </div>
+
+  <script is:inline>
+    // There is no backend — this composes a mail draft. The previous version
+    // dereferenced every field with no guards, so any markup change would have
+    // thrown and killed the handler silently.
+    function bindSignalForm() {
+      const form = document.getElementById('signal-form')
+      const note = document.getElementById('form-note')
+      if (!form || form.dataset.bound) return
+      form.dataset.bound = '1'
+
+      const val = (id, fallback) => {
+        const el = document.getElementById(id)
+        return (el && 'value' in el ? String(el.value).trim() : '') || fallback
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const name = val('f-name', 'Anonymous')
+        const topic = val('f-topic', '(no topic)')
+        const msg = val('f-msg', '')
+        const subject = encodeURIComponent('[ARCHIVE] ' + topic + ' — from ' + name)
+        const body = encodeURIComponent(msg + '\n\n— ' + name)
+        window.location.href =
+          'mailto:yar200000628@gmail.com?subject=' + subject + '&body=' + body
+        if (note) {
+          note.textContent = '已唤起邮件客户端。没反应就直接发到上面的地址。'
+          note.classList.add('visible')
+        }
+      })
+    }
+    bindSignalForm()
+    document.addEventListener('astro:page-load', bindSignalForm)
+    document.addEventListener('astro:after-swap', bindSignalForm)
+  </script>
 </BaseLayout>

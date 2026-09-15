@@ -1,18 +1,30 @@
-<svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="yatmt">
+  <!--
+    The mark: the first letter of the handle, printed out of register.
+
+    Only ONE slice is displaced. Displacing all three (and adding a vertical
+    offset) broke the glyph into loose fragments instead of reading as a
+    misprint — a misprint is interesting precisely because the rest of the
+    plate is aligned. The two outer slices sit exactly on the letter; the
+    middle one has slipped, and it is the Klein Blue one.
+  -->
   <defs>
-    <linearGradient id="g" x1="12" y1="10" x2="84" y2="86" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#6750A4"/>
-      <stop offset="1" stop-color="#8E7CFF"/>
-    </linearGradient>
+    <path id="y" d="M6.5 6.5 L16 17.5 L25.5 6.5 M16 17.5 L16 26.5"
+          fill="none" stroke-width="3.4" stroke-linecap="butt" stroke-linejoin="miter"/>
+    <clipPath id="s-top"><rect x="0" y="0" width="32" height="11"/></clipPath>
+    <clipPath id="s-mid"><rect x="0" y="11" width="32" height="5.5"/></clipPath>
+    <clipPath id="s-bot"><rect x="0" y="16.5" width="32" height="15.5"/></clipPath>
   </defs>
-  <rect x="8" y="8" width="80" height="80" rx="22" fill="url(#g)" />
 
-  <!-- Material Design Icons: account_circle -->
-  <path
-    fill="white"
-    opacity="0.92"
-    transform="translate(18 18) scale(2.5)"
-    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
-  />
+  <rect width="32" height="32" fill="#E8E6E1"/>
+
+  <g clip-path="url(#s-top)">
+    <use href="#y" x="-0.5" stroke="#111111"/>
+  </g>
+  <g clip-path="url(#s-mid)">
+    <use href="#y" x="2.3" stroke="#002FA7"/>
+  </g>
+  <g clip-path="url(#s-bot)">
+    <use href="#y" x="-0.4" stroke="#111111"/>
+  </g>
 </svg>
-
