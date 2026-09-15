@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { getCollection } from 'astro:content'
+import { site, projects } from '../data/site'
+import { getFeaturedRepos } from '../lib/github'
+import { sortPostsByDate, formatDate } from '../lib/utils'
+
+const allPosts = await getCollection('blog')
+const recentPosts = sortPostsByDate(allPosts).slice(0, 3)
+const githubRepos = await getFeaturedRepos(4)
+---
+
+<BaseLayout>
+  <section class="hero fade-in">
+    <img src={site.avatar} alt={site.name} class="hero-avatar" />
+    <h1>{site.name}</h1>
+    <p class="hero-subtitle">{site.title}</p>
+    <p class="hero-location">{site.location}</p>
+    <p class="hero-intro">{site.description}</p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">精选项目</h2>
+    <div class="card-grid">
+      {projects.map((project) => (
+        <div class="card">
+          <h3 class="card-title">
+            <a href={project.href} target="_blank" rel="noopener">{project.title}</a>
+          </h3>
+          <p class="card-description">{project.description}</p>
+          <div class="card-meta">
+            {project.tags.map((tag) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {githubRepos.length > 0 && (
+    <section class="section">
+      <h2 class="section-title">GitHub 仓库</h2>
+      <div class="card-grid">
+        {githubRepos.map((repo) => (
+          <div class="card">
+            <h3 class="card-title">
+              <a href={repo.url} target="_blank" rel="noopener">{repo.name}</a>
+            </h3>
+            <p class="card-description">{repo.description || '暂无描述'}</p>
+            <div class="card-meta">
+              {repo.language && <span class="tag">{repo.language}</span>}
+              <span class="tag">⭐ {repo.stars}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p style="margin-top: 1rem; text-align: center;">
+        <a href="https://github.com/Yar1991-Translation" target="_blank" rel="noopener" style="font-size: 0.9375rem;">
+          查看全部仓库 →
+        </a>
+      </p>
+    </section>
+  )}
+
+  {recentPosts.length > 0 && (
+    <section class="section">
+      <h2 class="section-title">最新文章</h2>
+      <ul class="post-list">
+        {recentPosts.map((post) => (
+          <li class="post-list-item">
+            <h3 class="post-list-title">
+              <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+            </h3>
+            <div class="post-list-meta">
+              <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+            </div>
+            <p class="post-list-excerpt">{post.data.description}</p>
+          </li>
+        ))}
+      </ul>
+      <p style="margin-top: 1rem; text-align: center;">
+        <a href="/blog" style="font-size: 0.9375rem;">查看全部文章 →</a>
+      </p>
+    </section>
+  )}
+
+  <section class="section">
+    <h2 class="section-title">联系我</h2>
+    <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+      合作、交流或闲聊都可以找我。
+    </p>
+    <p>
+      <a href="/contact" style="font-size: 0.9375rem;">查看联系方式 →</a>
+    </p>
+  </section>
+</BaseLayout>

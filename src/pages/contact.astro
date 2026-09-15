@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { site } from '../data/site'
+
+const icons: Record<string, string> = {
+  email: '✉️',
+  github: '🐙',
+  bilibili: '📺',
+  qq: '💬',
+  youtube: '▶️',
+}
+---
+
+<BaseLayout title="联系" description="联系方式">
+  <h1>联系</h1>
+  <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+    合作、交流或闲聊都可以找我。
+  </p>
+
+  <div class="contact-grid">
+    {site.social.map((item) => (
+      <a href={item.href} class="contact-item" target={item.href.startsWith('mailto') ? '_self' : '_blank'} rel="noopener">
+        <div class="contact-icon">{icons[item.icon] || '🔗'}</div>
+        <div>
+          <div class="contact-label">{item.label}</div>
+          <div class="contact-value">{item.href.replace(/^mailto:/, '').replace(/^https?:\/\//, '')}</div>
+        </div>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

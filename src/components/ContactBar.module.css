@@ -1,6 +1,0 @@
-/* 联系方式栏 */
-.bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}

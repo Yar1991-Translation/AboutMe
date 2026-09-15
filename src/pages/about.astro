@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { site } from '../data/site'
+---
+
+<BaseLayout title="关于" description="关于我">
+  <h1>关于</h1>
+  
+  <div class="about-content fade-in">
+    <p>
+      你好，我是 <strong>{site.name}</strong>，来自{site.location}。
+    </p>
+    
+    <p>
+      目前主要在 B 站做字幕翻译工作，喜欢把优秀的视频内容带给更多观众。
+      翻译不仅是语言的转换，更是文化的桥梁，我很享受这个过程。
+    </p>
+    
+    <p>
+      除了字幕，我也打游戏，偶尔写点小工具来解决实际问题。
+      对像素艺术和独立游戏有特别的偏爱，也尝试过自己做一些小游戏。
+    </p>
+    
+    <h2>技能</h2>
+    <div class="skill-tags">
+      <span class="tag">字幕翻译</span>
+      <span class="tag">时轴</span>
+      <span class="tag">Unity</span>
+      <span class="tag">像素艺术</span>
+      <span class="tag">视频剪辑</span>
+      <span class="tag">TypeScript</span>
+    </div>
+    
+    <h2>时间线</h2>
+    <ul>
+      <li><strong>2020</strong> — 开始在 B 站做字幕翻译</li>
+      <li><strong>2021</strong> — 建立字幕仓库，持续分享翻译作品</li>
+      <li><strong>2022</strong> — 尝试独立游戏开发</li>
+      <li><strong>2023</strong> — 继续字幕 + 游戏 + 写代码的日常</li>
+    </ul>
+    
+    <p>
+      如果你想联系我，可以查看 <a href="/contact">联系方式</a> 页面。
+    </p>
+  </div>
+</BaseLayout>

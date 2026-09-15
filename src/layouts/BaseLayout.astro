@@ -1,0 +1,122 @@
+---
+import { site } from '../data/site'
+import '../styles/global.css'
+
+interface Props {
+  title?: string
+  description?: string
+  image?: string
+  type?: 'website' | 'article'
+}
+
+const {
+  title = site.name,
+  description = site.description,
+  image = site.avatar,
+  type = 'website',
+} = Astro.props
+
+const canonicalURL = new URL(Astro.url.pathname, site.url)
+const fullTitle = title === site.name ? title : `${title} | ${site.name}`
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, site.url)} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="zh_CN" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, site.url)} />
+
+    <!-- Theme script (inline to prevent flash) -->
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme')
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark'
+        }
+        return 'light'
+      })()
+      document.documentElement.setAttribute('data-theme', theme)
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="site-title">{site.name}</a>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>首页</a></li>
+            <li><a href="/blog" class={Astro.url.pathname.startsWith('/blog') ? 'active' : ''}>博客</a></li>
+            <li><a href="/projects" class={Astro.url.pathname === '/projects' ? 'active' : ''}>项目</a></li>
+            <li><a href="/about" class={Astro.url.pathname === '/about' ? 'active' : ''}>关于</a></li>
+            <li><a href="/contact" class={Astro.url.pathname === '/contact' ? 'active' : ''}>联系</a></li>
+            <li>
+              <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">
+                <span id="theme-icon">☀️</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="container">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© {new Date().getFullYear()} {site.name}. 保留所有权利。</p>
+        <div class="footer-links">
+          <a href="/rss.xml">RSS</a>
+          <a href={site.social[1].href} target="_blank" rel="noopener">GitHub</a>
+          <a href={site.social[2].href} target="_blank" rel="noopener">Bilibili</a>
+        </div>
+      </div>
+    </footer>
+
+    <script is:inline>
+      const toggle = document.getElementById('theme-toggle')
+      const icon = document.getElementById('theme-icon')
+      
+      function updateIcon() {
+        const theme = document.documentElement.getAttribute('data-theme')
+        icon.textContent = theme === 'dark' ? '🌙' : '☀️'
+      }
+      
+      updateIcon()
+      
+      toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme')
+        const next = current === 'dark' ? 'light' : 'dark'
+        document.documentElement.setAttribute('data-theme', next)
+        localStorage.setItem('theme', next)
+        updateIcon()
+      })
+    </script>
+  </body>
+</html>

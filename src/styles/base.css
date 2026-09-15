@@ -16,8 +16,12 @@ body {
 
 body {
   min-height: 100vh;
-  color: var(--md-sys-color-on-background, #1a1c1e);
-  background-color: var(--md-sys-color-background, #fafcff);
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line-height);
+  font-weight: var(--md-sys-typescale-body-large-weight);
+  color: var(--md-sys-color-on-background);
+  background-color: var(--md-sys-color-background);
   transition: background-color var(--duration-base) var(--ease-in-out),
     color var(--duration-base) var(--ease-in-out);
 }
@@ -34,8 +38,9 @@ a {
 
 /* ========== 本地化 Material Symbols ========== */
 .material-symbols-rounded,
-md-icon {
-  font-family: 'Material Symbols Rounded';
+md-icon,
+[slot='icon'] {
+  font-family: 'Material Symbols Rounded' !important;
   font-weight: 400;
   font-style: normal;
   font-size: 24px;
@@ -45,7 +50,8 @@ md-icon {
   justify-content: center;
   vertical-align: middle;
   letter-spacing: normal;
-  text-transform: none;
+  /* Material Symbols 靠小写 ligature，禁止继承 uppercase */
+  text-transform: none !important;
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
