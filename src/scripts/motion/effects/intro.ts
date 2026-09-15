@@ -88,10 +88,19 @@ export default defineEffect({
       .to(
         bands,
         {
-          yPercent: (i) => (i % 2 === 0 ? -101 : 101),
-          duration: 0.62,
+          // `yPercent` is relative to the BAND's own height, which is only
+          // 1/BANDS of the viewport. Moving by ±101% therefore slides the top
+          // and bottom strips off screen but merely swaps the middle two —
+          // the cover never opened, it just rearranged and then vanished when
+          // the element was removed. Each strip has to travel the full
+          // viewport, i.e. BANDS × its own height.
+          //
+          // Top half exits upward, bottom half downward, so it opens from the
+          // middle seam outward.
+          yPercent: (i) => (i < BANDS / 2 ? -1 : 1) * 100 * BANDS,
+          duration: 0.72,
           ease: 'power4.inOut',
-          stagger: { each: 0.04, from: 'center' },
+          stagger: { each: 0.05, from: 'center' },
         },
         '-=0.05'
       )
