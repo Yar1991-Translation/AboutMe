@@ -5,7 +5,7 @@ export const site = {
   url: 'https://yatmt.vercel.app',
   avatar: '/toux.jpg',
   social: [
-    { label: 'Email', href: 'mailto:yar200000628@gmail.com', icon: 'email' },
+    { label: 'Email', href: 'mailto:yar20000628@gmail.com', icon: 'email' },
     { label: 'GitHub', href: 'https://github.com/Yar1991-Translation', icon: 'github' },
     { label: 'Bilibili', href: 'https://space.bilibili.com/517013017', icon: 'bilibili' },
     { label: 'QQ', href: 'tencent://message/?uin=3069049949&Site=qq&Menu=yes', icon: 'qq' },

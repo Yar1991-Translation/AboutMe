@@ -22,7 +22,9 @@ import { site } from '../data/site'
   <div class="wrap">
     <div class="form-grid">
       <div class="form-main rise" style="position: relative;">
-        <form id="signal-form" novalidate>
+        <!-- the address comes from site.ts so it cannot drift out of sync
+             with the links in the sidebar again -->
+        <form id="signal-form" data-mailto={site.social[0].href.replace('mailto:', '')} novalidate>
           <div class="field">
             <label for="f-name">Name / 称呼</label>
             <input id="f-name" name="name" type="text" autocomplete="name" required />
@@ -107,7 +109,7 @@ import { site } from '../data/site'
         const subject = encodeURIComponent('[ARCHIVE] ' + topic + ' — from ' + name)
         const body = encodeURIComponent(msg + '\n\n— ' + name)
         window.location.href =
-          'mailto:yar200000628@gmail.com?subject=' + subject + '&body=' + body
+          'mailto:' + (form.dataset.mailto || '') + '?subject=' + subject + '&body=' + body
         if (note) {
           note.textContent = '已唤起邮件客户端。没反应就直接发到上面的地址。'
           note.classList.add('visible')
