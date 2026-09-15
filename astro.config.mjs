@@ -2,7 +2,8 @@ import { defineConfig } from 'astro/config'
 import mdx from '@astrojs/mdx'
 
 export default defineConfig({
-  site: 'https://yatmt.vercel.app',
+  // Canonical origin. Feeds every canonical URL, og:url and the RSS links.
+  site: 'https://about.yatmt.site',
   output: 'static',
   // No sitemap integration. @astrojs/sitemap was a declared-but-unused
   // dependency; registering it crashes the build on this Astro version

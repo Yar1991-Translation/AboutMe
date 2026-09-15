@@ -2,7 +2,7 @@ export const site = {
   name: 'Yatmt',
   title: '字幕翻译 / 游戏玩家 / 偶尔写点代码',
   description: '在 B 站做字幕。也打游戏，偶尔写点小工具。',
-  url: 'https://yatmt.vercel.app',
+  url: 'https://about.yatmt.site',
   avatar: '/toux.jpg',
   social: [
     { label: 'Email', href: 'mailto:yar20000628@gmail.com', icon: 'email' },
