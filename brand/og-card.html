@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#E8E6E1; --ink:#111111; --blue:#002FA7; --blue-ink:#002FA7;
+    --line:rgba(17,17,17,.28); --line-soft:rgba(17,17,17,.12);
+    --mono:"SFMono-Regular","JetBrains Mono","IBM Plex Mono",Consolas,monospace;
+    --sans:"Inter","Helvetica Neue","Noto Sans SC","PingFang SC",sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  /* 1200x630 — the one ratio every chat client crops consistently.
+     Most of them render it in a dark UI, so the paper plate is the version
+     that stands out; and it is the site's primary theme anyway. */
+  .og {
+    position:relative; width:1200px; height:630px; overflow:hidden;
+    background:var(--bg); color:var(--ink); font-family:var(--sans);
+  }
+
+  .grid i { position:absolute; top:0; bottom:0; width:1px; background:var(--line-soft); }
+  .grid i:nth-child(4) { background:var(--blue); opacity:.3; }
+  .grid i:nth-child(9) { margin-left:8px; }
+  .grid i:nth-child(11) { bottom:44%; }
+
+  .pad { position:absolute; inset:0; padding:56px 64px 52px; display:flex; flex-direction:column; }
+
+  .head { display:flex; align-items:center; justify-content:space-between;
+          border-bottom:1px solid var(--ink); padding-bottom:16px; }
+  .mark { width:52px; height:52px; display:block; }
+  .head-r { font-family:var(--mono); font-size:14px; letter-spacing:.18em;
+            text-transform:uppercase; line-height:1.9; text-align:right; }
+  .head-r b { color:var(--blue-ink); font-weight:400; }
+
+  .mid { flex:1; display:flex; flex-direction:column; justify-content:center; }
+
+  .kicker { font-family:var(--mono); font-size:14px; letter-spacing:.22em;
+            text-transform:uppercase; opacity:.6; margin-bottom:14px; }
+
+  /* ink word, two blue bands out of register — same device as the site h1 */
+  .word { position:relative; font-weight:900; font-size:196px; line-height:1;
+          letter-spacing:-.045em; white-space:nowrap; }
+  .word .dot { color:var(--blue-ink); }
+  .strip { position:absolute; inset:0; display:block; white-space:nowrap;
+           color:var(--blue-ink); pointer-events:none;
+           font-weight:900; letter-spacing:-.045em; }
+  .s1 { clip-path:inset(0 0 70% 0); transform:translateX(-13px); }
+  .s2 { clip-path:inset(72% 0 0 0); transform:translateX(11px); }
+
+  .foot { display:flex; align-items:flex-end; justify-content:space-between;
+          border-top:1px solid var(--ink); padding-top:18px; }
+  .domain { font-size:34px; font-weight:800; letter-spacing:-.02em; }
+  .domain .d { color:var(--blue-ink); }
+  .meta { font-family:var(--mono); font-size:13px; letter-spacing:.16em;
+          text-transform:uppercase; opacity:.55; text-align:right; line-height:1.85; }
+</style>
+</head>
+<body>
+<div class="og">
+  <div class="grid">
+    <i style="left:64px"></i><i style="left:158px"></i><i style="left:252px"></i>
+    <i style="left:346px"></i><i style="left:440px"></i><i style="left:534px"></i>
+    <i style="left:628px"></i><i style="left:722px"></i><i style="left:816px"></i>
+    <i style="left:910px"></i><i style="left:1004px"></i><i style="left:1135px"></i>
+  </div>
+
+  <div class="pad">
+    <div class="head">
+      <svg class="mark" viewBox="0 0 32 32">
+        <defs>
+          <path id="mk" d="M6.5 6.5 L16 17.5 L25.5 6.5 M16 17.5 L16 26.5" fill="none"
+                stroke-width="3.4" stroke-linecap="butt" stroke-linejoin="miter"/>
+          <clipPath id="k0"><rect x="0" y="0" width="32" height="11"/></clipPath>
+          <clipPath id="k1"><rect x="0" y="11" width="32" height="5.5"/></clipPath>
+          <clipPath id="k2"><rect x="0" y="16.5" width="32" height="15.5"/></clipPath>
+        </defs>
+        <g clip-path="url(#k0)"><use href="#mk" x="-0.5" stroke="#111111"/></g>
+        <g clip-path="url(#k1)"><use href="#mk" x="2.3" stroke="#002FA7"/></g>
+        <g clip-path="url(#k2)"><use href="#mk" x="-0.4" stroke="#111111"/></g>
+      </svg>
+      <div class="head-r">
+        <div><b>YATMT</b> — Personal Archive</div>
+        <div>Static / No tracking</div>
+      </div>
+    </div>
+
+    <div class="mid">
+      <div class="kicker">Personal archive</div>
+      <div class="word">ARCHIVE<span class="dot">.</span>
+        <span class="strip s1" aria-hidden="true">ARCHIVE<span class="dot">.</span></span>
+        <span class="strip s2" aria-hidden="true">ARCHIVE<span class="dot">.</span></span>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="domain">about<span class="d">.</span>yatmt<span class="d">.</span>site</div>
+      <div class="meta">
+        <div>在 B 站做字幕。也打游戏，偶尔写点小工具。</div>
+        <div>Klein Blue #002FA7</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

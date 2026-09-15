@@ -14,7 +14,7 @@ interface Props {
 const {
   title = site.name,
   description = site.description,
-  image = site.avatar,
+  image = site.ogImage,
   type = 'website',
 } = Astro.props
 
@@ -50,7 +50,7 @@ const nav = [
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="zh_CN" />
 
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(image, site.url)} />
