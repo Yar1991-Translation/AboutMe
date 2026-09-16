@@ -17,7 +17,7 @@ const years = [...new Set(allPosts.map((p) => p.data.date.getFullYear()))].sort(
         <div class="measure" style="margin-bottom: 20px;">Note Index</div>
         <h1 class="archive-title rise" data-depth="1">Notes<span class="accent">.</span></h1>
         <p class="archive-lead rise">
-          {allPosts.length > 0 ? `${allPosts.length} 条笔记。想法、记录、碎片。` : '归档为空。'}
+          {allPosts.length > 0 ? `${allPosts.length} 条笔记，都在下面。` : '归档为空。'}
         </p>
         <blockquote style="font-size: 11px; opacity: 0.7; margin-top: 20px; font-style: italic; max-width: 46ch;">
           "不懂得外语的人，对自己的语言也一无所知。" — Johann Wolfgang von Goethe
@@ -81,7 +81,7 @@ const years = [...new Set(allPosts.map((p) => p.data.date.getFullYear()))].sort(
         <p class="measure" style="margin-bottom: 20px;">No entries on record</p>
         <p class="small" style="line-height: 1.8; opacity: 0.75; max-width: 46ch;">
           归档为空。写第一篇用 <code class="mono">npm run new:post "标题"</code>，
-          去掉 frontmatter 里的 <code class="mono">draft: true</code> 即可发布。
+          去掉 frontmatter 里的 <code class="mono">draft: true</code> 就会出现在这里。
         </p>
       </div>
     </section>
