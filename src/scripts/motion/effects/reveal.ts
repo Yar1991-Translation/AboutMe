@@ -4,6 +4,23 @@
  * Replaces the single monolithic block in Animations.astro. The behaviours are
  * unchanged; what changed is that each group is independently skippable and a
  * failure in one no longer takes the rest down.
+ *
+ * ── Why every entrance here is a `fromTo` and not a `from` ────────────────────
+ *
+ * `gsap.from(x, {autoAlpha: 0})` asks GSAP to read the element's CURRENT value
+ * and animate towards it. That is fine when the current value is the element's
+ * real resting state, and wrong whenever it is not — and during boot it is not.
+ *
+ * `html.js-motion:not(.motion-ready) .rise { opacity: 0 }` is still in force
+ * while this effect runs (`motion-ready` is added at the very end of boot), so
+ * the computed opacity of every `.rise` at that moment is 0. A `from` tween
+ * built then animates 0 -> 0 and the element never appears. For a long time a
+ * stray CSS keyframe was accidentally masking this by outranking the stylesheet
+ * rule and giving GSAP a non-zero number to read; removing the keyframe exposed
+ * it, and in `astro dev` the keyframe was usually reading 0 itself.
+ *
+ * `fromTo` states both ends outright, so the tween is correct no matter what
+ * the cascade happens to be showing when it is built.
  */
 import { defineEffect, ScrollTrigger } from '../kernel'
 import { intro } from '../state'
@@ -154,13 +171,17 @@ export default defineEffect({
     // ── Generic rise ──────────────────────────────────────────────────────
     const risers = qa('.rise').filter((el) => el !== heroTitle)
     if (risers.length) {
-      gsap.from(risers, {
-        autoAlpha: 0,
-        y: 20 * S.amp,
-        duration: S.dur,
-        ease: 'power2.out',
-        stagger: S.stagger,
-      })
+      gsap.fromTo(
+        risers,
+        { autoAlpha: 0, y: 20 * S.amp },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: S.dur,
+          ease: 'power2.out',
+          stagger: S.stagger,
+        }
+      )
     }
 
     // ── Klein Blue markers pop in ─────────────────────────────────────────
@@ -169,28 +190,35 @@ export default defineEffect({
     const nodes = qa('.sec-no-dot, .plate-node--blue, .annotation-node')
     if (nodes.length) {
       nodes.forEach((el) => {
-        gsap.from(el, {
-          scale: 0,
-          autoAlpha: 0,
-          transformOrigin: '50% 50%',
-          duration: 0.5,
-          ease: 'back.out(1.7)',
-          scrollTrigger: { trigger: el, start: 'top 92%', toggleActions: 'play none none none' },
-        })
+        gsap.fromTo(
+          el,
+          { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%' },
+          {
+            scale: 1,
+            autoAlpha: 1,
+            duration: 0.5,
+            ease: 'back.out(1.7)',
+            scrollTrigger: { trigger: el, start: 'top 92%', toggleActions: 'play none none none' },
+          }
+        )
       })
     }
 
     // ── Geometric frames: rotate in ───────────────────────────────────────
     qa('.geo-frame').forEach((frame, i) => {
       const spin = [0, 90, 180, -90][i % 4]
-      gsap.from(frame, {
-        rotation: spin + 360 * S.amp,
-        scale: 0.5 + 0.5 * (1 - S.amp),
-        autoAlpha: 0,
-        duration: S.dur * 1.6,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: frame, start: 'top 88%', toggleActions: 'play none none none' },
-      })
+      gsap.fromTo(
+        frame,
+        { rotation: spin + 360 * S.amp, scale: 0.5 + 0.5 * (1 - S.amp), autoAlpha: 0 },
+        {
+          rotation: 0,
+          scale: 1,
+          autoAlpha: 1,
+          duration: S.dur * 1.6,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: frame, start: 'top 88%', toggleActions: 'play none none none' },
+        }
+      )
     })
 
     // ── Section headers ───────────────────────────────────────────────────
@@ -200,31 +228,49 @@ export default defineEffect({
       const tl = gsap.timeline({
         scrollTrigger: { trigger: header, start: 'top 88%', toggleActions: 'play none none none' },
       })
-      if (h2) tl.from(h2, { autoAlpha: 0, x: -40 * S.amp, duration: S.dur, ease: 'power2.out' })
-      if (no) tl.from(no, { autoAlpha: 0, x: 40 * S.amp, duration: S.dur, ease: 'power2.out' }, '-=0.5')
+      if (h2)
+        tl.fromTo(
+          h2,
+          { autoAlpha: 0, x: -40 * S.amp },
+          { autoAlpha: 1, x: 0, duration: S.dur, ease: 'power2.out' }
+        )
+      if (no)
+        tl.fromTo(
+          no,
+          { autoAlpha: 0, x: 40 * S.amp },
+          { autoAlpha: 1, x: 0, duration: S.dur, ease: 'power2.out' },
+          '-=0.5'
+        )
     })
 
     // ── Infoboxes + their leader lines ────────────────────────────────────
     qa('.infobox').forEach((box) => {
-      gsap.from(box, {
-        autoAlpha: 0,
-        x: -30 * S.amp,
-        duration: S.dur * 1.1,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: box, start: 'top 88%', toggleActions: 'play none none none' },
-      })
+      gsap.fromTo(
+        box,
+        { autoAlpha: 0, x: -30 * S.amp },
+        {
+          autoAlpha: 1,
+          x: 0,
+          duration: S.dur * 1.1,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: box, start: 'top 88%', toggleActions: 'play none none none' },
+        }
+      )
       const leaders = qa('.infobox-leader').filter((l) => box.contains(l))
       if (leaders.length) {
         // `scaleX` only — the -3px optical offset lives in `top`, so this
         // tween no longer wipes it out.
-        gsap.from(leaders, {
-          scaleX: 0,
-          transformOrigin: 'left center',
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'power2.inOut',
-          scrollTrigger: { trigger: box, start: 'top 84%', toggleActions: 'play none none none' },
-        })
+        gsap.fromTo(
+          leaders,
+          { scaleX: 0, transformOrigin: 'left center' },
+          {
+            scaleX: 1,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power2.inOut',
+            scrollTrigger: { trigger: box, start: 'top 84%', toggleActions: 'play none none none' },
+          }
+        )
       }
     })
 
@@ -236,32 +282,50 @@ export default defineEffect({
       const tl = gsap.timeline({
         scrollTrigger: { trigger: plate, start: 'top 78%', toggleActions: 'play none none none' },
       })
-      if (img) tl.from(img, { autoAlpha: 0, scale: 1 + 0.05 * S.amp, duration: S.dur * 1.1, ease: 'power2.out' })
-      if (overlay) tl.from(overlay, { autoAlpha: 0, duration: 0.6 }, '-=0.4')
-      if (caption) tl.from(caption, { autoAlpha: 0, x: -20 * S.amp, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+      if (img)
+        tl.fromTo(
+          img,
+          { autoAlpha: 0, scale: 1 + 0.05 * S.amp },
+          { autoAlpha: 1, scale: 1, duration: S.dur * 1.1, ease: 'power2.out' }
+        )
+      if (overlay) tl.fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, '-=0.4')
+      if (caption)
+        tl.fromTo(
+          caption,
+          { autoAlpha: 0, x: -20 * S.amp },
+          { autoAlpha: 1, x: 0, duration: 0.5, ease: 'power2.out' },
+          '-=0.3'
+        )
     })
 
     // ── Blockquotes ───────────────────────────────────────────────────────
     qa('blockquote').forEach((quote) => {
-      gsap.from(quote, {
-        autoAlpha: 0,
-        y: 14 * S.amp,
-        duration: S.dur,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: quote, start: 'top 90%', toggleActions: 'play none none none' },
-      })
+      gsap.fromTo(
+        quote,
+        { autoAlpha: 0, y: 14 * S.amp },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: S.dur,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: quote, start: 'top 90%', toggleActions: 'play none none none' },
+        }
+      )
     })
 
     // ── Measurement lines ─────────────────────────────────────────────────
     const measures = qa('.measure, .annotation-line')
     if (measures.length) {
-      gsap.from(measures, {
-        scaleX: 0,
-        transformOrigin: 'left center',
-        duration: 0.7,
-        ease: 'power2.inOut',
-        scrollTrigger: { trigger: measures[0], start: 'top 92%', toggleActions: 'play none none none' },
-      })
+      gsap.fromTo(
+        measures,
+        { scaleX: 0, transformOrigin: 'left center' },
+        {
+          scaleX: 1,
+          duration: 0.7,
+          ease: 'power2.inOut',
+          scrollTrigger: { trigger: measures[0], start: 'top 92%', toggleActions: 'play none none none' },
+        }
+      )
     }
 
     // ── Lists: batched, so a 30-row page stays inside the trigger budget ──
@@ -273,14 +337,18 @@ export default defineEffect({
         interval: 0.08,
         batchMax: 6,
         onEnter: (batch) =>
-          gsap.from(batch, {
-            autoAlpha: 0,
-            x: -20 * S.amp,
-            duration: S.dur * 0.8,
-            ease: 'power1.out',
-            stagger: S.stagger,
-            overwrite: true,
-          }),
+          gsap.fromTo(
+            batch,
+            { autoAlpha: 0, x: -20 * S.amp },
+            {
+              autoAlpha: 1,
+              x: 0,
+              duration: S.dur * 0.8,
+              ease: 'power1.out',
+              stagger: S.stagger,
+              overwrite: true,
+            }
+          ),
       })
     })
 
@@ -296,14 +364,18 @@ export default defineEffect({
     qa('.xgrid').forEach((gridEl) => {
       const cards = Array.from(gridEl.querySelectorAll('.xcard'))
       if (!cards.length) return
-      gsap.from(cards, {
-        autoAlpha: 0,
-        y: 26 * S.amp,
-        duration: S.dur,
-        ease: 'power2.out',
-        stagger: S.stagger,
-        scrollTrigger: { trigger: gridEl, start: 'top 88%', once: true },
-      })
+      gsap.fromTo(
+        cards,
+        { autoAlpha: 0, y: 26 * S.amp },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: S.dur,
+          ease: 'power2.out',
+          stagger: S.stagger,
+          scrollTrigger: { trigger: gridEl, start: 'top 88%', once: true },
+        }
+      )
     })
 
     qa('.xlist').forEach((list) => {
@@ -314,29 +386,37 @@ export default defineEffect({
         interval: 0.06,
         batchMax: 6,
         onEnter: (batch) =>
-          gsap.from(batch, {
-            autoAlpha: 0,
-            x: -14 * S.amp,
-            duration: S.dur * 0.8,
-            ease: 'power1.out',
-            stagger: S.stagger,
-            overwrite: true,
-          }),
+          gsap.fromTo(
+            batch,
+            { autoAlpha: 0, x: -14 * S.amp },
+            {
+              autoAlpha: 1,
+              x: 0,
+              duration: S.dur * 0.8,
+              ease: 'power1.out',
+              stagger: S.stagger,
+              overwrite: true,
+            }
+          ),
       })
     })
 
     // ── Tag cloud (only exists on the archive index) ──────────────────────
     const cloud = document.querySelector('.tag-cloud')
     if (cloud) {
-      gsap.from(cloud.querySelectorAll('.tag'), {
-        autoAlpha: 0,
-        y: -10 * S.amp,
-        rotationZ: (i) => (i % 2 === 0 ? 2 : -2) * S.amp,
-        duration: 0.5,
-        ease: 'power1.out',
-        stagger: { each: 0.04, from: 'random' },
-        scrollTrigger: { trigger: cloud, start: 'top 85%', toggleActions: 'play none none none' },
-      })
+      gsap.fromTo(
+        cloud.querySelectorAll('.tag'),
+        { autoAlpha: 0, y: -10 * S.amp, rotationZ: (i: number) => (i % 2 === 0 ? 2 : -2) * S.amp },
+        {
+          autoAlpha: 1,
+          y: 0,
+          rotationZ: 0,
+          duration: 0.5,
+          ease: 'power1.out',
+          stagger: { each: 0.04, from: 'random' },
+          scrollTrigger: { trigger: cloud, start: 'top 85%', toggleActions: 'play none none none' },
+        }
+      )
     }
 
     // ── Detail page: three columns converge ───────────────────────────────
@@ -345,10 +425,26 @@ export default defineEffect({
       const left = document.querySelector('.detail-aside--left')
       const main = document.querySelector('.detail-main')
       const right = document.querySelector('.detail-aside--right')
-      if (left) tl.from(left, { autoAlpha: 0, x: -40 * S.amp, duration: S.dur, ease: 'power2.out' })
+      if (left)
+        tl.fromTo(
+          left,
+          { autoAlpha: 0, x: -40 * S.amp },
+          { autoAlpha: 1, x: 0, duration: S.dur, ease: 'power2.out' }
+        )
       if (main)
-        tl.from(main, { autoAlpha: 0, y: 30 * S.amp, duration: S.dur * 1.15, ease: 'power2.out' }, '-=0.4')
-      if (right) tl.from(right, { autoAlpha: 0, x: 40 * S.amp, duration: S.dur, ease: 'power2.out' }, '-=0.5')
+        tl.fromTo(
+          main,
+          { autoAlpha: 0, y: 30 * S.amp },
+          { autoAlpha: 1, y: 0, duration: S.dur * 1.15, ease: 'power2.out' },
+          '-=0.4'
+        )
+      if (right)
+        tl.fromTo(
+          right,
+          { autoAlpha: 0, x: 40 * S.amp },
+          { autoAlpha: 1, x: 0, duration: S.dur, ease: 'power2.out' },
+          '-=0.5'
+        )
     }
 
     return () => {

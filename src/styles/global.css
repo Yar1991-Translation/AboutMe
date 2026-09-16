@@ -1164,16 +1164,34 @@ blockquote.quote--plain::after {
    leaves; a blanket stylesheet rule promoted every plane to its own
    compositor layer for the entire session. */
 
-/* fade-in (restrained) — no-JS / pre-JS entrance only.
-   TRANSFORM OWNERSHIP: once GSAP is driving an element (scroll, pointer, timeline)
-   it owns `transform`. A CSS keyframe with `fill: both` would silently win over
-   GSAP's inline styles, so anything GSAP touches must opt out here. */
+/* Fade-in for the no-JS case. NOT a pre-JS state — see below.
+ *
+ * TRANSFORM OWNERSHIP, and this one was not theoretical. A CSS animation sits
+ * in a higher cascade origin than an inline style, so with `fill: both` a
+ * finished keyframe keeps overriding whatever GSAP writes, forever. reveal.ts
+ * puts `opacity: 0; visibility: hidden` on every .rise as its entrance start
+ * state; this keyframe pinned opacity back to 1 and said nothing about
+ * visibility, so the element rendered "fully opaque, hidden" — invisible, with
+ * nothing left to reveal it. It was also a race: GSAP's `from` tween takes the
+ * element's CURRENT value as its END value, and whatever the keyframe happened
+ * to be showing when the tween was built became the target. Read it at 0 and
+ * the tween ran 0 -> 0 and the element never appeared.
+ *
+ * Slow module loading in `astro dev` lost that race nearly every time, which is
+ * why the page only broke there. The previous rule opted out only
+ * `.rise[data-depth]` — one element on one page — while reveal.ts drives ALL of
+ * them.
+ *
+ * So: the keyframe is now strictly the no-JS entrance. The bundle's head script
+ * sets `js-motion` synchronously, so the moment there is a motion layer to hand
+ * the element to, this is gone and GSAP owns opacity, visibility and transform
+ * outright. */
 @keyframes rise {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .rise { animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.rise[data-depth] { animation: none; }
+html.js-motion .rise { animation: none; }
 
 /* ===== DISSOCIATIVE EFFECTS ===== */
 
@@ -1207,13 +1225,9 @@ blockquote.quote--plain::after {
   rotate: -0.6deg;
 }
 
-/* Blueprint grid reveal on scroll */
-@keyframes grid-reveal {
-  from { opacity: 0; transform: scale(1.02); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.grid-reveal { animation: grid-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+/* .grid-reveal lived here: a `fill: both` keyframe on opacity and transform,
+   referenced by no markup, waiting for someone to use it on an element GSAP
+   also drives. Deleted rather than documented. */
 
 /* Klein Blue line extension */
 .line-extend {
@@ -1244,13 +1258,17 @@ blockquote.quote--plain::after {
   height: 6px;
   background: var(--blue);
   pointer-events: none;
-  animation: float-node 3s ease-in-out infinite;
 }
 
+/* No-JS float. reveal.ts scales this node in, and an infinite keyframe on
+   `transform` overrides that inline scale completely — the pop-in was being
+   silently deleted. With the motion layer live the float is done by ambient.ts
+   instead, on `y`, which composes with the scale rather than replacing it. */
 @keyframes float-node {
   0%, 100% { transform: translate(0, 0); }
   50% { transform: translate(3px, -5px); }
 }
+html:not(.js-motion) .annotation-node { animation: float-node 3s ease-in-out infinite; }
 
 /* Technical leader line */
 .leader-line {

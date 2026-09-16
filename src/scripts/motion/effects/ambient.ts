@@ -22,7 +22,8 @@ const SCROLL_BOUND = {
 export default defineEffect({
   id: 'ambient',
   minTier: TIER.MOBILE,
-  targets: '.geo-frame, .plate-wave-float, .wave-deco path, .plate-node--blue, .dissociate-1, .dissociate-2',
+  targets:
+    '.geo-frame, .plate-wave-float, .wave-deco path, .plate-node--blue, .annotation-node, .dissociate-1, .dissociate-2',
 
   run({ gsap, S }) {
     // ── Geometric frames drift ────────────────────────────────────────────
@@ -62,6 +63,22 @@ export default defineEffect({
         opacity: 0.35,
         duration: 1.6,
         delay: i * 0.25,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+        scrollTrigger: { trigger: node, ...SCROLL_BOUND },
+      })
+    })
+
+    // ── Annotation nodes drift ────────────────────────────────────────────
+    // Same wander the stylesheet used to run as an infinite keyframe. It moved
+    // here because the keyframe owned `transform` outright and wiped the scale
+    // the reveal pass writes to the same property.
+    qa('.annotation-node').forEach((node, i) => {
+      gsap.to(node, {
+        y: -5,
+        x: 3,
+        duration: 3 + i * 0.4,
         ease: 'sine.inOut',
         repeat: -1,
         yoyo: true,
