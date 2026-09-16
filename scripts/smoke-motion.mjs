@@ -8,14 +8,20 @@
  * unguarded `::before` selector did exactly that and silently disabled every
  * animation on the site.
  */
-import { readFileSync, readdirSync, copyFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { readFileSync, readdirSync, copyFileSync, mkdirSync, rmSync } from 'node:fs'
+import { join, dirname } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { JSDOM } from 'jsdom'
 
 const DIST = process.argv[2]
 const ASTRO = join(DIST, '_astro')
-const HERE = new URL('.', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
+
+/* The harness has to copy the bundle next to itself to import it by URL, and
+   it used to do that into `scripts/` — which quietly littered the repo with
+   hashed chunks on every run. Give it its own gitignored scratch dir. */
+const HERE = join(dirname(fileURLToPath(import.meta.url)), '..', '.smoke')
+rmSync(HERE, { recursive: true, force: true })
+mkdirSync(HERE, { recursive: true })
 
 // Copy the WHOLE _astro dir — the entry is the small hoisted chunk, which
 // imports the big one by relative path.
@@ -28,7 +34,18 @@ copyFileSync(join(ASTRO, bundleSrc), bundlePath)
 
 // One page per process — module-level GSAP state would otherwise leak between
 // pages and mask real failures.
-const pages = process.argv[3] ? [process.argv[3]] : ['index.html']
+// Defaults cover one page per effect family: the hero/ticker/grid on the
+// index, the filter bar + Flip + meters on the bench, a plate-heavy detail
+// page, and a plain route with none of the above.
+const pages = process.argv[3]
+  ? [process.argv[3]]
+  : [
+      'index.html',
+      'experiments/index.html',
+      'experiments/motion-lab/index.html',
+      'blog/index.html',
+      'about/index.html',
+    ]
 
 // jsdom under-reports these; the site only uses them as feature probes.
 const mkMedia = (q) => ({
@@ -70,6 +87,20 @@ for (const page of pages) {
     const r = { top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0, x: 0, y: 0 }
     return Object.assign([r], { item: () => r })
   }
+  /* jsdom implements no SVG geometry at all, and three of the plugins reach
+     straight into it: DrawSVG measures with getBBox/getTotalLength, and Flip's
+     absolute mode reads bounding boxes on every node it moves. Without these
+     stubs the harness reports failures that are jsdom's gaps, not the site's. */
+  const box = { x: 0, y: 0, width: 120, height: 120, top: 0, left: 0, right: 120, bottom: 120 }
+  window.SVGElement.prototype.getBBox = () => box
+  window.SVGElement.prototype.getTotalLength = () => 120
+  window.SVGElement.prototype.getPointAtLength = () => ({ x: 0, y: 0 })
+  window.SVGElement.prototype.getScreenCTM = () => ({
+    a: 1, b: 0, c: 0, d: 1, e: 0, f: 0,
+    inverse() { return this },
+    multiply() { return this },
+  })
+
   window.scrollTo = () => {}
   window.requestAnimationFrame = (cb) => setTimeout(() => cb(Date.now()), 16)
   window.cancelAnimationFrame = (id) => clearTimeout(id)
@@ -160,7 +191,19 @@ for (const page of pages) {
   console.log(`  motion-ready     : ${root.classList.contains('motion-ready')}`)
   console.log(`  data-motion-tier : ${root.getAttribute('data-motion-tier') ?? '(unset)'}`)
   console.log(`  FAILED EFFECTS   : ${failedEffects.length ? failedEffects.join(', ') : 'none'}`)
-  console.log(`  injected nodes   : hud=${window.document.querySelectorAll('.hud').length} grid=${window.document.querySelectorAll('.grid-layer').length} ghosts=${window.document.querySelectorAll('.ghost-layer').length} reticle=${window.document.querySelectorAll('.reticle').length} intro=${window.document.querySelectorAll('.intro').length}`)
+  const count = (sel) => window.document.querySelectorAll(sel).length
+  console.log(`  injected nodes   : hud=${count('.hud')} grid=${count('.grid-layer')} ghosts=${count('.ghost-layer')} reticle=${count('.reticle')} intro=${count('.intro')}`)
+  console.log(`  new surfaces     : ticker-sets=${count('.ticker-set')} nav-sentinel=${count('.nav-sentinel')} meters=${count('.meter-fill')} xcards=${count('.xcard')} filter-btns=${count('.fbtn')}`)
+
+  // Meters and count-ups must be readable even if an effect was skipped: the
+  // authored value lives in CSS/HTML precisely so nothing reports 0.
+  const meters = Array.from(window.document.querySelectorAll('.meter'))
+  if (meters.length) {
+    const sample = meters
+      .slice(0, 4)
+      .map((m) => `${m.getAttribute('data-meter')}%→--meter:${m.style.getPropertyValue('--meter') || '(unset)'}`)
+    console.log(`  meter fallback   : ${sample.join('  ')}`)
+  }
 
   const motionWarnings = warnings.filter((w) => w.includes('[motion]') || w.includes('GSAP') || w.includes('Invalid'))
   if (motionWarnings.length) {

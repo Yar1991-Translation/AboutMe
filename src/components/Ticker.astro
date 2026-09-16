@@ -1,0 +1,47 @@
+---
+/**
+ * Full-bleed ticker band.
+ *
+ * One set is authored; the marquee effect clones more until the track is at
+ * least twice the viewport wide, then loops it by exactly half its own width —
+ * so the seam is never visible regardless of how long the items are. Without
+ * JS it degrades to a static (still readable) strip rather than an empty bar.
+ */
+interface Props {
+  items?: string[]
+  /** run the belt the other way */
+  reverse?: boolean
+  /** seconds for one full loop at rest */
+  speed?: number
+}
+
+const {
+  items = [
+    'Archive / Yatmt',
+    '25.03° N — 101.55° E',
+    '字幕翻译',
+    'Klein Blue #002FA7',
+    '静态生成 · 无追踪',
+    'Half-finished things',
+  ],
+  reverse = false,
+  speed = 26,
+} = Astro.props
+---
+
+<div
+  class="ticker"
+  data-ticker
+  data-ticker-reverse={reverse ? '' : undefined}
+  data-ticker-speed={speed}
+  aria-hidden="true"
+>
+  <div class="ticker-track" data-ticker-track>
+    <span class="ticker-set">
+      {items.map((item) => <span class="ticker-item">{item}</span>)}
+    </span>
+    <span class="ticker-set">
+      {items.map((item) => <span class="ticker-item">{item}</span>)}
+    </span>
+  </div>
+</div>

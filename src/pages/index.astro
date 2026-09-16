@@ -1,15 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
+import Ticker from '../components/Ticker.astro'
 import { getCollection } from 'astro:content'
+import { sortPostsByDate, sortExperiments, lastTouched } from '../lib/utils'
+import { statusOf } from '../data/experiments'
 import { site } from '../data/site'
-import { sortPostsByDate } from '../lib/utils'
 
 const latestPosts = sortPostsByDate(await getCollection('blog')).slice(0, 4)
+const bench = sortExperiments(await getCollection('experiments')).slice(0, 3)
+const benchTotal = (await getCollection('experiments')).filter((e) => !e.data.draft).length
 ---
 
 <BaseLayout>
   {/* ===== HERO ===== */}
-  <section class="hero">
+  <section class="hero" data-hero>
     <div class="wrap grid-12">
       <div class="hero-kicker rise">
         <span>Personal Archive</span>
@@ -17,22 +21,80 @@ const latestPosts = sortPostsByDate(await getCollection('blog')).slice(0, 4)
       <h1 class="hero-title rise" data-depth="1">Archive<span class="accent">.</span></h1>
       <div class="hero-side rise">
         <span class="side-label">Subject / 对象</span>
-        <p>{site.description}</p>
-        <blockquote style="font-size: 11px; opacity: 0.7; margin-top: 16px; font-style: italic;">
-          "语言的边界就是世界的边界。" — Ludwig Wittgenstein
-        </blockquote>
+        <p>{site.title}</p>
       </div>
       <div class="hero-meta rise">
         <span>25.03° N, 101.55° E</span>
         <span>Klein Blue #002FA7</span>
       </div>
+      <div class="hero-scroll rise" aria-hidden="true">
+        <span class="hero-scroll-line"><span class="hero-scroll-fill"></span></span>
+        <span class="hero-scroll-label">Scroll</span>
+      </div>
     </div>
   </section>
 
-  {/* ===== TAG CLOUD ===== */}
+  <Ticker />
+
+  {/* ===== BENCH — 没做完的东西 ===== */}
+  {bench.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 data-scramble>Bench</h2>
+          <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. 01 — Unfinished</span>
+        </div>
+        <p class="small" style="line-height: 1.75; opacity: 0.8; max-width: 52ch; margin-bottom: 40px;">
+          做了一半、还没删的东西。{benchTotal} 件在册。
+        </p>
+
+        <div class="xgrid">
+          {bench.map((e, i) => {
+            const st = statusOf(e.data.status)
+            return (
+              <article class={`xcard xcard--${e.data.status}`} data-status={e.data.status}>
+                <a class="xcard-link" href={`/experiments/${e.slug}`}>
+                  <header class="xcard-head">
+                    <span class="xcard-fig">EX—{String(i + 1).padStart(2, '0')}</span>
+                    <span class={`status status--${e.data.status}`}>
+                      <i class="status-dot" aria-hidden="true" />
+                      {st.label}
+                    </span>
+                  </header>
+                  <h2 class="xcard-title">{e.data.title}</h2>
+                  <p class="xcard-desc">{e.data.description}</p>
+                  <div
+                    class="meter"
+                    data-meter={e.data.progress}
+                    style={`--meter:${e.data.progress / 100}`}
+                  >
+                    <span class="meter-track" aria-hidden="true"></span>
+                    <span class="meter-fill" aria-hidden="true"></span>
+                    <span class="meter-value" data-count={e.data.progress} data-count-suffix="%">
+                      {e.data.progress}%
+                    </span>
+                  </div>
+                  <footer class="xcard-foot">
+                    <span class="xcard-touched mono">{lastTouched(e).toISOString().slice(0, 10)}</span>
+                    <span class="xcard-note">{st.zh}</span>
+                  </footer>
+                </a>
+              </article>
+            )
+          })}
+        </div>
+
+        <div style="margin-top: 40px;">
+          <a href="/experiments" class="btn" data-glitch>All experiments</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ===== QUOTE ===== */}
   <section class="section">
     <div class="wrap grid-12">
-      <div style="grid-column: 1 / span 12; text-align: center;">
+      <div style="grid-column: 1 / span 12;">
         <blockquote class="quote--plain" style="font-size: 14px; opacity: 0.8;">
           "完美不是无可增添，而是无可删减。" — Antoine de Saint-Exupéry
         </blockquote>
@@ -44,8 +106,8 @@ const latestPosts = sortPostsByDate(await getCollection('blog')).slice(0, 4)
   <section class="section">
     <div class="wrap">
       <div class="sec-head">
-        <h2>Updates</h2>
-        <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. 03 — Log</span>
+        <h2 data-scramble>Updates</h2>
+        <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. 02 — Log</span>
       </div>
       <ul class="rows">
         {latestPosts.map((post) => (

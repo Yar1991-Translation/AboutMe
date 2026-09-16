@@ -27,9 +27,10 @@ const path = Astro.url.pathname
 
 const nav = [
   { idx: '01', label: 'Index', href: '/', match: (p: string) => p === '/' },
-  { idx: '02', label: 'Notes', href: '/blog', match: (p: string) => p.startsWith('/blog') },
-  { idx: '03', label: 'About', href: '/about', match: (p: string) => p === '/about' },
-  { idx: '04', label: 'Contact', href: '/contact', match: (p: string) => p === '/contact' },
+  { idx: '02', label: 'Lab', href: '/experiments', match: (p: string) => p.startsWith('/experiments') },
+  { idx: '03', label: 'Notes', href: '/blog', match: (p: string) => p.startsWith('/blog') },
+  { idx: '04', label: 'About', href: '/about', match: (p: string) => p === '/about' },
+  { idx: '05', label: 'Contact', href: '/contact', match: (p: string) => p === '/contact' },
 ]
 ---
 

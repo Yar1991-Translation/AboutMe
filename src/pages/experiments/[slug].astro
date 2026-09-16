@@ -1,0 +1,275 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import GeometricFrame from '../../components/GeometricFrame.astro'
+import WaveDecoration from '../../components/WaveDecoration.astro'
+import { getCollection } from 'astro:content'
+import { sortExperiments, lastTouched, getLength } from '../../lib/utils'
+import { statusOf } from '../../data/experiments'
+
+export async function getStaticPaths() {
+  const all = sortExperiments(await getCollection('experiments'))
+  return all.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }))
+}
+
+const { entry } = Astro.props
+const { title, description, date, status, progress, tags, stack, works, blocked, next, links } =
+  entry.data
+const { Content, headings } = await entry.render()
+
+const st = statusOf(status)
+const touched = lastTouched(entry)
+const length = getLength(entry.body ?? '')
+
+// Same ordering as the index, so "next" walks down the bench.
+const all = sortExperiments(await getCollection('experiments'))
+const i = all.findIndex((e) => e.slug === entry.slug)
+const before = i > 0 ? all[i - 1] : null
+const after = i < all.length - 1 ? all[i + 1] : null
+
+const toc = headings.filter((h) => h.depth <= 3 && !/^footnotes?$/i.test(h.text.trim()))
+
+const panels = [
+  { key: 'Works', zh: '还能跑的部分', items: works, empty: null },
+  {
+    key: 'Blocked',
+    zh: '卡住的地方',
+    items: blocked,
+    // An experiment with nothing blocking it is not an experiment, it is a
+    // to-do. Say so rather than rendering an empty box.
+    empty: '没有记下卡点 —— 那它大概不该停在这一栏。',
+  },
+]
+---
+
+<BaseLayout title={title} description={description} type="article">
+  <div class="wrap">
+    <div class="detail">
+      {/* LEFT — state */}
+      <aside class="detail-aside detail-aside--left">
+        <div class="aside-block">
+          <div class="aside-label">State</div>
+          <div class={`xstate xstate--${status}`}>
+            <span class="xstate-code mono">{st.code}</span>
+            <span class="xstate-label">{st.label}</span>
+            <span class="xstate-zh">{st.zh}</span>
+            <p class="xstate-note">{st.note}</p>
+          </div>
+        </div>
+
+        <div class="aside-block">
+          <div class="aside-label">Progress</div>
+          <div
+            class="meter meter--stack"
+            data-meter={progress}
+            style={`--meter:${progress / 100}`}
+          >
+            <span class="meter-track" aria-hidden="true" />
+            <span class="meter-fill" aria-hidden="true" />
+            <span class="meter-value" data-count={progress} data-count-suffix="%">{progress}%</span>
+          </div>
+          <p class="micro" style="opacity: 0.6; margin-top: 8px; line-height: 1.6;">
+            粗估，不用当真
+          </p>
+        </div>
+
+        <div class="aside-block">
+          <div class="aside-label">Metadata</div>
+          <div class="aside-row">
+            <span class="k">Started</span>
+            <span class="v">{date.toISOString().slice(0, 10)}</span>
+          </div>
+          <div class="aside-row">
+            <span class="k">Touched</span>
+            <span class="v">{touched.toISOString().slice(0, 10)}</span>
+          </div>
+        </div>
+
+        {
+          stack.length > 0 && (
+            <div class="aside-block">
+              <div class="aside-label">Stack</div>
+              <div class="aside-stack">
+                {stack.map((s) => (
+                  <span class="stack-item mono">{s}</span>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        {
+          tags.length > 0 && (
+            <div class="aside-block">
+              <div class="aside-label">Tags</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                {tags.map((t) => (
+                  <span class="tag">{t}</span>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        {
+          links.length > 0 && (
+            <div class="aside-block">
+              <div class="aside-label">External</div>
+              <div class="aside-links">
+                {links.map((l) => (
+                  <a class="btn btn--small btn--flat" href={l.href} target="_blank" rel="noopener">
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </aside>
+
+      {/* CENTER — the record */}
+      <article class="detail-main">
+        <div class="detail-header" style="position: relative;">
+          <div class="measure" style="margin-bottom: 20px;">
+            Experiment — {date.getFullYear()}
+          </div>
+          <h1 class="detail-title">{title}</h1>
+          <p class="detail-desc">{description}</p>
+          <GeometricFrame size="large" variant="cross" />
+        </div>
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        {
+          panels.map((p) => (
+            <section class="xpanel" data-panel={p.key.toLowerCase()}>
+              <div class="sec-head sec-head--tight">
+                <h2 data-scramble>{p.key}</h2>
+                <span class="sec-no">
+                  <span class="sec-no-dot" aria-hidden="true" />
+                  {p.zh}
+                </span>
+              </div>
+              {p.items.length > 0 ? (
+                <ul class="xlist">
+                  {p.items.map((item) => (
+                    <li>
+                      <span class="xlist-mark" aria-hidden="true" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="small xpanel-empty">{p.empty}</p>
+              )}
+            </section>
+          ))
+        }
+
+        {
+          next && (
+            <section class="xpanel" data-panel="next">
+              <div class="sec-head sec-head--tight">
+                <h2 data-scramble>Next</h2>
+                <span class="sec-no">
+                  <span class="sec-no-dot" aria-hidden="true" />下一步
+                </span>
+              </div>
+              <p class="xnext">{next}</p>
+            </section>
+          )
+        }
+
+        {(before || after) && (
+          <nav class="pn-nav" aria-label="上一个/下一个实验">
+            {before ? (
+              <a href={`/experiments/${before.slug}`}>
+                <span class="pn-label">← {statusOf(before.data.status).label}</span>
+                <span>{before.data.title}</span>
+              </a>
+            ) : (
+              <div />
+            )}
+            {after && (
+              <a href={`/experiments/${after.slug}`}>
+                <span class="pn-label">{statusOf(after.data.status).label} →</span>
+                <span>{after.data.title}</span>
+              </a>
+            )}
+          </nav>
+        )}
+      </article>
+
+      {/* RIGHT — contents */}
+      <aside class="detail-aside detail-aside--right">
+        {
+          toc.length > 0 && (
+            <div class="aside-block">
+              <div class="aside-label">Contents</div>
+              <ul class="toc-list">
+                {toc.map((h) => (
+                  <li class={`lvl-${h.depth}`}>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+
+        <div class="aside-block">
+          <div class="infobox">
+            <div class="infobox-title">
+              <span>This Entry</span>
+              <span class="fig">EX—01</span>
+            </div>
+            <div class="infobox-row">
+              <span class="infobox-key">Status</span>
+              <span class="infobox-leader" />
+              <span class="infobox-val">{st.label}</span>
+            </div>
+            <div class="infobox-row">
+              <span class="infobox-key">Days</span>
+              <span class="infobox-leader" />
+              <span class="infobox-val">
+                {Math.max(1, Math.round((touched.valueOf() - date.valueOf()) / 86400000))}
+              </span>
+            </div>
+            <div class="infobox-row">
+              <span class="infobox-key">Length</span>
+              <span class="infobox-leader" />
+              <span class="infobox-val">{length.chars}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="aside-block" style="position: relative;">
+          <WaveDecoration position="right" variant={2} />
+          <a class="btn btn--small" href="/experiments" style="margin-top: 16px;">Bench</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .detail-header {
+    margin-bottom: 56px;
+  }
+
+  .sec-head--tight {
+    margin-bottom: 24px;
+  }
+
+  .btn--small {
+    padding: 8px 16px;
+    font-size: 10px;
+  }
+
+  @media (max-width: 960px) {
+    .detail-header {
+      margin-bottom: 40px;
+    }
+  }
+</style>

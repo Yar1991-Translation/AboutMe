@@ -85,7 +85,8 @@ function splitChars(el: Element): void {
 
 export default defineEffect({
   id: 'reveal',
-  targets: '.rise, .sec-head, .infobox, .rows li, .plate, .geo-frame, blockquote, .detail-aside, .detail-main',
+  targets:
+    '.rise, .sec-head, .infobox, .rows li, .plate, .geo-frame, blockquote, .detail-aside, .detail-main, .xcard, .xlist li',
 
   run({ gsap, tier, S }) {
     let disarmed = false
@@ -275,6 +276,47 @@ export default defineEffect({
           gsap.from(batch, {
             autoAlpha: 0,
             x: -20 * S.amp,
+            duration: S.dur * 0.8,
+            ease: 'power1.out',
+            stagger: S.stagger,
+            overwrite: true,
+          }),
+      })
+    })
+
+    // ── Experiment cards ──────────────────────────────────────────────────
+    // ONE trigger for the whole grid, with `once: true`.
+    //
+    // A per-card ScrollTrigger.batch looked equivalent and was not: batch
+    // triggers re-evaluate on every refresh, and filtergrid.ts refreshes on
+    // every filter change — so cards that had just animated back in were
+    // faded out from zero a second time, by a trigger that had nothing left
+    // to do. Binding to the grid and killing the trigger on first play makes
+    // the entrance unrepeatable, which is what "entrance" means.
+    qa('.xgrid').forEach((gridEl) => {
+      const cards = Array.from(gridEl.querySelectorAll('.xcard'))
+      if (!cards.length) return
+      gsap.from(cards, {
+        autoAlpha: 0,
+        y: 26 * S.amp,
+        duration: S.dur,
+        ease: 'power2.out',
+        stagger: S.stagger,
+        scrollTrigger: { trigger: gridEl, start: 'top 88%', once: true },
+      })
+    })
+
+    qa('.xlist').forEach((list) => {
+      const rows = Array.from(list.querySelectorAll('li'))
+      if (!rows.length) return
+      ScrollTrigger.batch(rows, {
+        start: 'top 92%',
+        interval: 0.06,
+        batchMax: 6,
+        onEnter: (batch) =>
+          gsap.from(batch, {
+            autoAlpha: 0,
+            x: -14 * S.amp,
             duration: S.dur * 0.8,
             ease: 'power1.out',
             stagger: S.stagger,

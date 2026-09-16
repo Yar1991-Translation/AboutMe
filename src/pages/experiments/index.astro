@@ -1,0 +1,263 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import GeometricFrame from '../../components/GeometricFrame.astro'
+import Ticker from '../../components/Ticker.astro'
+import { getCollection } from 'astro:content'
+import {
+  sortExperiments,
+  getAllExperimentTags,
+  countByStatus,
+  lastTouched,
+} from '../../lib/utils'
+import { STATUS_ORDER, statusOf } from '../../data/experiments'
+
+const all = sortExperiments(await getCollection('experiments'))
+const tags = getAllExperimentTags(all)
+const counts = countByStatus(all)
+
+// Only statuses that actually occur get a filter button — an empty filter is a
+// dead control, and there are five statuses for what is usually a short list.
+const filters = STATUS_ORDER.filter((s) => (counts[s] ?? 0) > 0)
+
+const stats = [
+  { key: 'Total', val: all.length },
+  { key: 'In motion', val: counts.active ?? 0 },
+  { key: 'Shelved', val: (counts.paused ?? 0) + (counts.dormant ?? 0) },
+  { key: 'Seeds', val: counts.seed ?? 0 },
+  { key: 'Dropped', val: counts.abandoned ?? 0 },
+]
+---
+
+<BaseLayout
+  title="Experiments"
+  description="做了一半、还留着的东西。每条都记录了它停在什么地方。"
+>
+  {/* ===== HEADER ===== */}
+  <section class="lab-head">
+    <div class="wrap grid-12">
+      <div style="grid-column: 1 / span 8; position: relative;">
+        <div class="measure" style="margin-bottom: 20px;">Unfinished work</div>
+        <h1 class="lab-title rise" data-ghost data-depth="1">
+          Experiments<span class="accent">.</span>
+        </h1>
+        <p class="archive-lead rise">
+          {
+            all.length > 0
+              ? `${all.length} 件没做完的东西。这里记录的不是成果，是它们各自停在什么地方 —— 以及为什么停在那里。`
+              : '还没有记下任何东西。'
+          }
+        </p>
+        <blockquote style="font-size: 11px; opacity: 0.7; margin-top: 20px; font-style: italic; max-width: 48ch;">
+          "一个未完成的作品，比一个完成的作品更能说明作者是谁。"
+        </blockquote>
+        <GeometricFrame size="large" variant="slice" />
+      </div>
+
+      <div style="grid-column: 10 / span 3; align-self: end;">
+        <div class="infobox" style="margin-top: 40px;">
+          <div class="infobox-title">
+            <span>Status Board</span>
+            <span class="fig">EX—00</span>
+          </div>
+          {
+            stats.map((s) => (
+              <div class="infobox-row">
+                <span class="infobox-key">{s.key}</span>
+                <span class="infobox-leader" />
+                <span class="infobox-val" data-count={s.val}>
+                  {s.val}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Runs the other way to the home band, so the two are never in phase. */}
+  <Ticker
+    reverse
+    speed={34}
+    items={[
+      'In motion 01',
+      'Paused 01',
+      'Dormant 01',
+      'Seeds 01',
+      'Dropped 00',
+      'Status is the content',
+      'Nothing here is finished',
+    ]}
+  />
+
+  {
+    all.length === 0 ? (
+      <section class="section">
+        <div class="wrap">
+          <div class="sec-head">
+            <h2>Void</h2>
+            <span class="sec-no">
+              <span class="sec-no-dot" aria-hidden="true" />SEC. 01 — Empty
+            </span>
+          </div>
+          <p class="measure" style="margin-bottom: 20px;">Nothing on the bench</p>
+          <p class="small" style="line-height: 1.8; opacity: 0.75; max-width: 46ch;">
+            记一条用 <code class="mono">npm run new:experiment "标题"</code>，
+            把 frontmatter 里的 <code class="mono">draft: true</code> 去掉就会出现在这里。
+          </p>
+        </div>
+      </section>
+    ) : (
+      <>
+        {/* ===== FILTER =====
+            Hidden until the motion bundle arms it (html.motion-ready). If JS
+            never runs, every card stays visible and no dead control is shown. */}
+        <section class="section section--filter">
+          <div class="wrap">
+            <div class="filter-bar" data-filter-bar>
+              <span class="filter-label">Filter</span>
+
+              <div class="filter-set" role="group" aria-label="按状态筛选">
+                <button type="button" class="fbtn is-on" data-filter="all" aria-pressed="true">
+                  All <em>{all.length}</em>
+                </button>
+                {filters.map((s) => (
+                  <button type="button" class="fbtn" data-filter={s} aria-pressed="false">
+                    {statusOf(s).label} <em>{counts[s]}</em>
+                  </button>
+                ))}
+              </div>
+
+              {tags.length > 0 && (
+                <div class="filter-set filter-set--tags" role="group" aria-label="按标签筛选">
+                  {tags.map((t) => (
+                    <button type="button" class="fbtn fbtn--tag" data-tag={t} aria-pressed="false">
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <p class="filter-count" data-filter-count aria-live="polite">
+                {all.length} shown
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== GRID ===== */}
+        <section class="section">
+          <div class="wrap">
+            <div class="sec-head">
+              <h2 data-scramble>Bench</h2>
+              <span class="sec-no">
+                <span class="sec-no-dot" aria-hidden="true" />SEC. 02 — Index
+              </span>
+            </div>
+
+            <div class="xgrid" data-xgrid>
+              {all.map((e, i) => {
+                const st = statusOf(e.data.status)
+                const touched = lastTouched(e)
+                return (
+                  <article
+                    class={`xcard xcard--${e.data.status} ${['', 'offset-1', 'offset-3', 'offset-2', 'offset-4'][i % 5]}`}
+                    data-status={e.data.status}
+                    data-tags={e.data.tags.join('|')}
+                  >
+                    <a class="xcard-link" href={`/experiments/${e.slug}`}>
+                      <header class="xcard-head">
+                        <span class="xcard-fig">EX—{String(i + 1).padStart(2, '0')}</span>
+                        <span class={`status status--${e.data.status}`}>
+                          <i class="status-dot" aria-hidden="true" />
+                          {st.label}
+                        </span>
+                      </header>
+
+                      <h2 class="xcard-title">{e.data.title}</h2>
+                      <p class="xcard-desc">{e.data.description}</p>
+
+                      <div
+                        class="meter"
+                        data-meter={e.data.progress}
+                        style={`--meter:${e.data.progress / 100}`}
+                      >
+                        <span class="meter-track" aria-hidden="true" />
+                        <span class="meter-fill" aria-hidden="true" />
+                        <span class="meter-value" data-count={e.data.progress} data-count-suffix="%">
+                          {e.data.progress}%
+                        </span>
+                      </div>
+
+                      <footer class="xcard-foot">
+                        <span class="xcard-touched mono">{touched.toISOString().slice(0, 10)}</span>
+                        <span class="xcard-note">{st.zh}</span>
+                      </footer>
+                    </a>
+                  </article>
+                )
+              })}
+            </div>
+
+            <p class="xgrid-empty" data-xgrid-empty hidden>
+              没有符合条件的条目。
+            </p>
+          </div>
+        </section>
+      </>
+    )
+  }
+
+  {/* ===== FOOTNOTE ===== */}
+  <section class="section">
+    <div class="wrap grid-12">
+      <div style="grid-column: 1 / span 6;">
+        <blockquote>
+          "完成"是被高估的状态。大部分真正有意思的东西，都死在百分之六十的地方。
+        </blockquote>
+      </div>
+      <div style="grid-column: 8 / span 5; align-self: center;">
+        <p class="small" style="line-height: 1.7; opacity: 0.8;">
+          这里不写「即将推出」。停着就是停着。
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lab-head {
+    padding: 96px 0 80px;
+    border-bottom: 1px solid var(--ink);
+    position: relative;
+  }
+
+  /* `--fs-display` tops out at 144px, which is sized for the 6-character
+     "Notes." — "Experiments." is twice that and would run off the grid. */
+  .lab-title {
+    font-size: clamp(2.25rem, 7.6vw, 6rem);
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    line-height: 0.9;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .archive-lead {
+    font-size: var(--fs-small);
+    line-height: 1.75;
+    max-width: 52ch;
+    opacity: 0.85;
+  }
+
+  .section--filter {
+    padding-bottom: 0;
+    border-top: none;
+  }
+
+  @media (max-width: 960px) {
+    .lab-head {
+      padding: 64px 0 56px;
+    }
+  }
+</style>

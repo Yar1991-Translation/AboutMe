@@ -89,7 +89,12 @@ export default defineEffect({
           if (!entry.isIntersecting) continue
           const el = entry.target as HTMLElement
           const heading = el.querySelector('.sec-head h2, h1')
-          const label = heading ? visibleText(heading) : ''
+          /* A heading that is mid-scramble contains noise, and the HUD would
+             report that noise as the section you are in. scramble.ts publishes
+             the settled string on the element for exactly this read. */
+          const label = heading
+            ? heading.getAttribute('data-scramble-text') ?? visibleText(heading)
+            : ''
           state.section = (label || 'INDEX').toUpperCase().slice(0, 18)
         }
       },

@@ -1891,3 +1891,451 @@ html.has-reticle *:not(input):not(textarea):not(select):not(option) {
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   EXPERIMENTS SURFACE
+   --------------------------------------------------------------------------
+   Everything the lab needs that the blog did not: a ticker band, a status
+   marker, a ruler-style progress meter, a filter bar, and the card the whole
+   index is built from.
+
+   The card is the first place on the site where a border is deliberately LEFT
+   OPEN: the chamfer cuts the top-right corner off, and the 1px border is
+   clipped away with it. A closed 1px box with a rounded corner is furniture;
+   a box with a corner cut out of it is a drawing.
+   ========================================================================== */
+
+/* --- Ticker band ---------------------------------------------------------- */
+.ticker {
+  position: relative;
+  overflow: clip;
+  border-bottom: 1px solid var(--ink);
+  background: var(--bg);
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.ticker-set { display: flex; flex: none; align-items: center; }
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 11px 16px 11px 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.72;
+}
+/* the separator is the same Klein Blue square used everywhere else as a node */
+.ticker-item::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  background: var(--blue);
+  flex: none;
+}
+
+/* --- Status marker -------------------------------------------------------- */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.status-dot { display: block; width: 6px; height: 6px; flex: none; background: var(--ink); }
+
+/* active is the only status that gets the accent — it is the only one where
+   something is actually still happening */
+.status--active { border-color: var(--blue); color: var(--blue-ink); }
+.status--active .status-dot { background: var(--blue); }
+.status--paused .status-dot { background: transparent; border: 1px solid currentColor; }
+.status--dormant .status-dot { background: var(--line); }
+.status--seed .status-dot { background: transparent; border: 1px solid var(--blue); }
+.status--abandoned { opacity: 0.5; }
+.status--abandoned .status-dot { background: transparent; border: 1px solid currentColor; }
+
+/* --- Meter — a ruler, not a progress bar ---------------------------------- */
+.meter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.meter-track,
+.meter-fill {
+  grid-column: 1;
+  grid-row: 1;
+  height: 6px;
+}
+.meter-track {
+  border: 1px solid var(--line);
+  /* ten graduations, so the fill reads as a measurement rather than a bar */
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--line-soft) 0,
+    var(--line-soft) 1px,
+    transparent 1px,
+    transparent 10%
+  );
+}
+.meter-fill {
+  margin: 1px;
+  background: var(--blue);
+  /* TRANSFORM OWNERSHIP, the exception that proves the rule: the true length
+     lives HERE, in a custom property set inline by the page, because a meter
+     that reads 0% when JavaScript never runs is a lie. countup.ts animates it
+     with `fromTo` (never `to`) so it starts from zero and lands back on the
+     authored value. */
+  transform: scaleX(var(--meter, 0));
+  transform-origin: left center;
+}
+.meter-value {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--blue-ink);
+}
+.meter--stack { grid-template-columns: minmax(0, 1fr); }
+.meter--stack .meter-value { grid-column: 1; grid-row: 2; justify-self: end; }
+
+/* --- Experiment card ------------------------------------------------------ */
+.xgrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 40px var(--gutter);
+  /* Flip's `absolute: true` mode positions the leaving cards against the
+     nearest positioned ancestor — without this they would fly to the page. */
+  position: relative;
+}
+
+.xcard {
+  grid-column: span 4;
+  position: relative;
+  min-width: 0;
+}
+.xcard:nth-child(1),
+.xcard:nth-child(2) { grid-column: span 6; }
+
+.xcard-link {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 22px 22px 18px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  /* the corner is cut, and the border is cut with it */
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+  transition: border-color 0.35s ease, color 0.35s ease;
+}
+.xcard-link:hover { border-color: var(--ink); }
+
+/* blueprint grid, revealed on hover — same language as the figure plates */
+.xcard-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.xcard-link:hover::before { opacity: 1; }
+
+/* fills the void the chamfer leaves behind */
+.xcard-link::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  background: var(--blue);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  transform: scale(0);
+  transform-origin: top right;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.xcard-link:hover::after,
+.xcard-link:focus-visible::after { transform: scale(1); }
+
+.xcard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.xcard-fig {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  opacity: 0.6;
+}
+
+.xcard-title {
+  font-size: clamp(1.125rem, 1.9vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 18px 0 10px;
+  transition: color 0.25s ease;
+}
+.xcard-link:hover .xcard-title { color: var(--blue-ink); }
+
+.xcard-desc {
+  font-size: var(--fs-small);
+  line-height: 1.7;
+  opacity: 0.78;
+  /* pushes the foot to the bottom so cards in a row line up */
+  margin-bottom: auto;
+  max-width: none;
+}
+
+.xcard-foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  opacity: 0.65;
+}
+.xcard-touched { font-variant-numeric: tabular-nums; }
+.xcard-note { text-transform: uppercase; letter-spacing: 0.14em; }
+
+/* --- Filter bar -----------------------------------------------------------
+   Rendered only once the motion layer arms it (see filtergrid.ts + the
+   `html.motion-ready` gate). With no JS the bar simply is not there and every
+   card stays visible — a filter that does nothing is worse than no filter. */
+[data-filter-bar] { display: none; }
+html.motion-ready [data-filter-bar] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+}
+
+.filter-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue-ink);
+}
+.filter-set { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter-set--tags { border-left: 1px solid var(--line); padding-left: 22px; }
+
+.fbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+.fbtn em { font-style: normal; opacity: 0.5; }
+.fbtn:hover { border-color: var(--ink); }
+.fbtn.is-on { background: var(--blue); border-color: var(--blue); color: #ffffff; }
+.fbtn.is-on em { opacity: 0.8; }
+.fbtn--tag { border-style: dashed; }
+
+.filter-count {
+  margin: 0 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.xgrid-empty {
+  padding: 56px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
+/* --- Experiment detail ---------------------------------------------------- */
+.xstate {
+  position: relative;
+  border: 1px solid var(--ink);
+  padding: 14px;
+}
+.xstate-code {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--blue-ink);
+  margin-bottom: 8px;
+}
+.xstate-label {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.xstate-zh { display: block; font-size: 11px; opacity: 0.7; margin-top: 2px; }
+.xstate-note {
+  font-size: 10px;
+  line-height: 1.65;
+  opacity: 0.6;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  max-width: none;
+}
+.xstate--active { border-color: var(--blue); }
+.xstate--abandoned { opacity: 0.65; }
+
+.aside-stack { display: flex; flex-direction: column; gap: 4px; }
+.stack-item {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+  padding-left: 12px;
+  position: relative;
+}
+.stack-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 6px;
+  height: 1px;
+  background: var(--blue);
+}
+.aside-links { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+
+.xpanel { margin: 56px 0; }
+.xlist { list-style: none; border-top: 1px solid var(--line); }
+.xlist li {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--fs-small);
+  line-height: 1.75;
+}
+.xlist-mark { width: 6px; height: 6px; margin-top: 8px; background: var(--blue); }
+/* a blocker is an absence — drawn as a hollow marker, not a filled one */
+[data-panel="blocked"] .xlist-mark { background: transparent; border: 1px solid var(--ink); }
+.xpanel-empty { opacity: 0.6; font-style: italic; }
+.xnext {
+  font-size: var(--fs-small);
+  line-height: 1.8;
+  border-left: 3px solid var(--blue);
+  padding-left: 16px;
+  max-width: 56ch;
+  margin-bottom: 0;
+}
+
+/* --- Traveling nav indicator ---------------------------------------------
+   Inserted by navline.ts. Replaces the per-link CSS bar once the motion layer
+   is live: two blue lines chasing each other under the same row reads as a
+   bug, not as an effect. */
+.site-header nav { position: relative; }
+.nav-sentinel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: var(--blue);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.nav-sentinel.is-armed { opacity: 1; }
+
+html.motion-ready .nav-links a:hover::after,
+html.motion-ready .nav-links a.active::after { transform: scaleX(0); }
+
+/* --- Hero scroll cue ------------------------------------------------------ */
+.hero-scroll {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.hero-scroll-line {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 56px;
+  background: var(--line);
+  overflow: clip;
+}
+/* a real element, not a pseudo — hero.ts draws it in on load */
+.hero-scroll-fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--blue);
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+.hero-scroll-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  writing-mode: vertical-rl;
+}
+
+/* --- Pre-JS state for the new surfaces ------------------------------------ */
+html.js-motion:not(.motion-ready) .xcard { opacity: 0; }
+
+@media (max-width: 1100px) {
+  .hero-scroll { display: none; }
+}
+
+@media (max-width: 960px) {
+  .xgrid { gap: 32px 0; }
+  .xcard,
+  .xcard:nth-child(1),
+  .xcard:nth-child(2) { grid-column: 1 / -1; }
+  .xcard-link { padding: 20px 18px 16px; }
+  .filter-set--tags { border-left: none; padding-left: 0; width: 100%; }
+  .filter-count { margin-left: 0; width: 100%; }
+  .xpanel { margin: 40px 0; }
+}

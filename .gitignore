@@ -30,3 +30,6 @@ pnpm-debug.log*
 
 # astro generated types
 .astro/
+
+# motion smoke-test scratch space
+.smoke/

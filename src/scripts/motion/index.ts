@@ -26,6 +26,13 @@ import './effects/hud'
 import './effects/progress'
 import './effects/cursor'
 import './effects/interactions'
+import './effects/navline'
+import './effects/marquee'
+import './effects/scramble'
+import './effects/draw'
+import './effects/countup'
+import './effects/magnetic'
+import './effects/filtergrid'
 
 let running = false
 
