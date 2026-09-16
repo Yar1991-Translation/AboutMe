@@ -157,9 +157,31 @@ em { font-style: italic; }
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  border-bottom: 1px solid var(--ink);
   padding-bottom: 10px;
   margin-bottom: 40px;
+  position: relative;
+}
+
+/* The rule under a section header is BROKEN and out of register: two segments
+   with a gap between them, the right one sitting three pixels lower than the
+   left. A single unbroken rule reads as a finished document; this reads as a
+   plate that was printed in two passes and did not line up. */
+.sec-head::before,
+.sec-head::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  height: 1px;
+  background: var(--ink);
+}
+.sec-head::before {
+  left: 0;
+  width: 61%;
+}
+.sec-head::after {
+  right: 0;
+  width: 34%;
+  transform: translateY(3px);
 }
 .sec-head h2 {
   font-size: var(--fs-h2);
@@ -172,6 +194,121 @@ em { font-style: italic; }
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
+/* --- Dissociative decoration: the broken rules -----------------------------
+   Every long horizontal rule in the document — under the header, under each
+   hero, above the footer — is drawn as two segments that do not share a
+   baseline: the left run at the true position, the right run three pixels
+   lower and stopping short.
+
+   Both segments come from ONE pseudo-element, as two background layers, so
+   no element needs more than one of its two pseudo-elements and nothing
+   collides with what is already on them.
+
+   This is the same fault as the section headers above, applied everywhere.
+   One broken rule is a detail; every rule in the document broken the same
+   way is a property of the printing. */
+.site-header,
+.hero,
+.site-footer {
+  position: relative;
+}
+.site-header,
+.hero {
+  border-bottom: none;
+}
+.site-footer {
+  border-top: none;
+}
+
+.site-header::after,
+.hero::after,
+.site-footer::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 0 / 61% 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 100% 3px / 34% 1px no-repeat;
+  pointer-events: none;
+}
+.site-header::after,
+.hero::after {
+  bottom: 0;
+}
+.site-footer::after {
+  top: 0;
+}
+
+/* --- Dissociative decoration: the plate numeral ----------------------------
+   Every top-level section carries a plate number, numbered by a CSS counter
+   so each page gets its own series with no markup to maintain — five plates
+   on the index, two on About, one on Contact.
+
+   The number is printed TWICE, out of register: a blue impression sitting a
+   few pixels up and left of the ink one. A single faint numeral reads as an
+   editorial watermark; two that disagree read as a plate run through the
+   press twice, which is the same fault the horizontal rules carry.
+
+   It is also hung past the right edge so `overflow-x: clip` crops it — the
+   number is larger than the frame holding it — and pushed off the grid, down
+   its own height and skewed against the baseline.
+
+   The hero is excluded. It is a <section> too, so it was competing with this
+   rule for both of its pseudo-elements, and `.hero::after` (0,1,1 for the
+   broken rule below) beat `main > section::after` (0,0,3) — the ink numeral
+   silently rendered empty on every page whose first section is the hero. The
+   hero is the masthead, not a numbered plate; excluding it fixes the
+   collision and starts the series at 01 on the first real section. */
+main {
+  counter-reset: plate;
+}
+main > section:not(.hero) {
+  counter-increment: plate;
+  position: relative;
+}
+main > section:not(.hero)::before,
+main > section:not(.hero)::after {
+  position: absolute;
+  top: 0;
+  right: -0.03em;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(4rem, 9vw, 7rem);
+  line-height: 0.78;
+  letter-spacing: -0.06em;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  /* off the grid: dropped down its own height and skewed against the
+     baseline, so it is not sitting neatly in a column */
+  transform: translateY(12%) skewY(-1.2deg);
+}
+
+/* the first impression — ink */
+main > section:not(.hero)::after {
+  content: counter(plate, decimal-leading-zero);
+  color: var(--ink);
+  opacity: 0.04;
+}
+
+/* the second, out of register — blue, up and to the left */
+main > section:not(.hero)::before {
+  content: counter(plate, decimal-leading-zero);
+  color: var(--blue);
+  opacity: 0.055;
+  transform: translate(-7px, -6px) translateY(12%) skewY(-1.2deg);
+}
+
+/* Micro-registration: the mono section labels are printed a hair to the left
+   of themselves, in blue. Half a pixel is below the threshold of "coloured
+   text" and reads instead as a printing fault. */
+.sec-no,
+.measure {
+  text-shadow: 0.5px 0 0 var(--blue-ink);
+}
+
 /* real element, not ::before — GSAP cannot animate pseudo-elements.
    uses `top` rather than translateY so GSAP owns `transform` outright */
 .sec-no-dot {
