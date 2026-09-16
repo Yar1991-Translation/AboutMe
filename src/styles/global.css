@@ -16,8 +16,16 @@
   --line: rgba(17, 17, 17, 0.28);
   --line-soft: rgba(17, 17, 17, 0.12);
 
-  --font-sans: "Inter", "Helvetica Neue", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-mono: "SFMono-Regular", "JetBrains Mono", "IBM Plex Mono", Consolas, monospace;
+  /* Inter first, so every Latin glyph and numeral is Inter; MiSans catches the
+     Chinese. The face is declared at weight 100-900 (see scripts/sync-fonts.mjs),
+     so the Chinese is Bold at every weight the stylesheet asks for — including
+     body copy, which is the intent. The system CJK fonts stay on the end of the
+     stack as a fallback for the window before the webfont arrives. */
+  --font-sans: "Inter", "MiSans", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  /* Chinese inside a mono run (.sec-no, .measure, .infobox-key) has no mono
+     face to fall back to, so it went to whatever the system picked. It reads
+     MiSans now like everything else. */
+  --font-mono: "SFMono-Regular", "JetBrains Mono", "IBM Plex Mono", Consolas, "MiSans", monospace;
 
   /* 56–144px. The cap was 96px, which left a display title occupying barely
      half of its 9-column span — the heading read as small and adrift rather
@@ -47,6 +55,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
+  /* MiSans Bold is the only Chinese weight on the site, and it is declared
+     across the full 100-900 range so no request can miss it. This stops a
+     browser from also synthesising a heavier weight on top, which turned the
+     display headings into sludge. */
+  font-synthesis-weight: none;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -892,7 +905,8 @@ blockquote.quote--plain::after {
 .prose h6 {
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 500;
+  /* no weight requested: the mono faces carry 400 and 700 only, and the rest of
+     the site's mono labels sit at 400 */
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--blue-ink);
@@ -915,7 +929,6 @@ blockquote.quote--plain::after {
 .prose th {
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   border-bottom: 1px solid var(--ink);

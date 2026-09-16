@@ -61,10 +61,13 @@ const nav = [
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Only the weights the stylesheet actually uses. Noto Sans SC is served
-         with unicode-range subsets, so unused CJK glyphs are never fetched. -->
+    <!-- Chinese is self-hosted: MiSans Bold, pre-subsetted into 100 unicode-range
+         files, so a page pulls only the handful of subsets it needs. Inter stays
+         on Google Fonts and still carries every Latin glyph and numeral. -->
+    <link rel="stylesheet" href="/fonts/misans/misans-bold.css" />
+    <!-- Only the weights the stylesheet actually uses. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Noto+Sans+SC:wght@400;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap"
       rel="stylesheet"
     />
 
