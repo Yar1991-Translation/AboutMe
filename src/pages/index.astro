@@ -15,6 +15,22 @@ const benchTotal = allExperiments.filter((e) => !e.data.draft).length
 // SEC. 01 anywhere on the page.
 let sec = 0
 const nextSec = () => String(++sec).padStart(2, '0')
+
+/**
+ * The colophon, as fields.
+ *
+ * This block used to be three sentences of self-description ("静态生成、没有
+ * 追踪脚本、只有一种颜色") with a Dieter Rams quote parked underneath. Three
+ * virtues in a row reads as a pitch, and a colophon is the one place a personal
+ * site may talk about itself without pitching: it says how the thing was made
+ * and stops. A spec sheet has no opinions, so it needs no quote.
+ */
+const colophon = [
+  { k: 'Build', v: 'Astro' },
+  { k: 'Motion', v: 'GSAP' },
+  { k: 'Type', v: 'Inter / Noto Sans SC' },
+  { k: 'Server', v: '无' },
+]
 ---
 
 <BaseLayout>
@@ -144,21 +160,22 @@ const nextSec = () => String(++sec).padStart(2, '0')
     </div>
   </section>
 
-  {/* ===== BULLETIN ===== */}
+  {/* ===== COLOPHON ===== */}
   <section class="section">
     <div class="wrap grid-12">
       <div style="grid-column: 1 / span 4;">
         <div class="infobox">
           <div class="infobox-title">
-            <span>Bulletin</span>
-            <span class="fig">B—01</span>
+            <span>Colophon</span>
+            <span class="fig">C—01</span>
           </div>
-          <p class="micro" style="line-height: 1.7; margin-bottom: 10px;">
-            静态生成的站点，没有追踪脚本。全站只有一种颜色。
-          </p>
-          <p class="micro" style="line-height: 1.7; opacity: 0.7;">
-            "少，但更好。" — Dieter Rams
-          </p>
+          {colophon.map((row) => (
+            <div class="infobox-row">
+              <span class="infobox-key">{row.k}</span>
+              <span class="infobox-leader" />
+              <span class="infobox-val">{row.v}</span>
+            </div>
+          ))}
         </div>
       </div>
       <div style="grid-column: 7 / span 6; align-self: center;">
