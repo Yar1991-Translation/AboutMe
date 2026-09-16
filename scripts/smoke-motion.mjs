@@ -8,7 +8,7 @@
  * unguarded `::before` selector did exactly that and silently disabled every
  * animation on the site.
  */
-import { readFileSync, readdirSync, copyFileSync, mkdirSync, rmSync } from 'node:fs'
+import { readFileSync, readdirSync, copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { JSDOM } from 'jsdom'
@@ -32,20 +32,49 @@ for (const f of readdirSync(ASTRO)) {
 }
 copyFileSync(join(ASTRO, bundleSrc), bundlePath)
 
+/**
+ * One page per effect family: the hero / ticker / plate / grid on the index,
+ * the filter bar and Flip on the bench, an article for the reading progress
+ * and scroll spy, and plain routes with none of the above.
+ *
+ * Resolved against what the build actually produced rather than hard-coded.
+ * This list used to name routes by hand, so deleting a content entry made the
+ * script crash on a missing file instead of reporting on the site.
+ */
+const PREFERRED = [
+  'index.html',
+  'experiments/index.html',
+  'blog/index.html',
+  'about/index.html',
+  'contact/index.html',
+]
+
+/** the first article page that exists — post and experiment layouts share
+ *  .detail / .prose / .toc-list, so either one covers the progress effect */
+function firstArticle() {
+  for (const dir of readdirSync(DIST, { withFileTypes: true })) {
+    if (!dir.isDirectory() || dir.name.startsWith('_')) continue
+    for (const sub of readdirSync(join(DIST, dir.name), { withFileTypes: true })) {
+      if (!sub.isDirectory()) continue
+      const candidate = `${dir.name}/${sub.name}/index.html`
+      if (existsSync(join(DIST, candidate))) return candidate
+    }
+  }
+  return null
+}
+
 // One page per process — module-level GSAP state would otherwise leak between
 // pages and mask real failures.
-// Defaults cover one page per effect family: the hero/ticker/grid on the
-// index, the filter bar + Flip + meters on the bench, a plate-heavy detail
-// page, and a plain route with none of the above.
 const pages = process.argv[3]
   ? [process.argv[3]]
-  : [
-      'index.html',
-      'experiments/index.html',
-      'experiments/motion-lab/index.html',
-      'blog/index.html',
-      'about/index.html',
-    ]
+  : [...PREFERRED, firstArticle()].filter((p) => p && existsSync(join(DIST, p)))
+
+const skipped = PREFERRED.filter((p) => !existsSync(join(DIST, p)))
+if (skipped.length) console.log(`note: not built, skipped — ${skipped.join(', ')}`)
+if (!pages.length) {
+  console.error(`no pages found under ${DIST} — run \`npm run build\` first`)
+  process.exit(1)
+}
 
 // jsdom under-reports these; the site only uses them as feature probes.
 const mkMedia = (q) => ({

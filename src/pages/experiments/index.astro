@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import GeometricFrame from '../../components/GeometricFrame.astro'
 import Ticker from '../../components/Ticker.astro'
+import TbaPlate from '../../components/TbaPlate.astro'
 import { getCollection } from 'astro:content'
 import {
   sortExperiments,
@@ -211,23 +212,27 @@ const stats = [
     )
   }
 
-  {/* ===== FOOTNOTE =====
-      Two things a reader would otherwise get wrong about this page. They used
-      to be a pair of aphorisms about unfinished work — balanced, quotable, and
-      telling you nothing you could act on. */}
+  {/* ===== TWO PLATES =====
+      One specimen, printed twice, and neither print is in register. The copy
+      that belongs here is not written yet, so the plates stand in for it.
+
+      They are deliberately NOT a matched pair: different size, different
+      offset, different ink, and a frame that disagrees with the image it is
+      registering. Two identical plates side by side would be the one thing on
+      this page that lines up. */}
   <section class="section">
     <div class="wrap grid-12">
       <div style="grid-column: 1 / span 6;">
-        <p class="measure" style="margin-bottom: 16px;">Ordering</p>
-        {/* TBA — 占位。换成真正写排序规则的那段话：
+        <p class="measure offset-1" style="margin-bottom: 28px;">Ordering</p>
+        {/* TBA — 换成写排序规则的那段话：
             「排序先看状态。还在动的排最上面，已经放弃的沉到底下。
               同一状态里才按日期排。」 */}
-        <img class="tba" src="/TBA.webp" alt="TBA" width="216" height="216" loading="lazy" decoding="async" />
+        <TbaPlate fig="FIG. TBA-1" label="待补" slipX={-14} slipY={14} size={216} depth={-0.6} />
       </div>
       <div style="grid-column: 8 / span 5; align-self: start;">
-        <p class="measure" style="margin-bottom: 16px;">Progress</p>
-        {/* TBA — 占位。原文：「进度是粗估，别拿它横向比。」 */}
-        <img class="tba" src="/TBA.webp" alt="TBA" width="216" height="216" loading="lazy" decoding="async" />
+        <p class="measure offset-3" style="margin-bottom: 28px;">Progress</p>
+        {/* TBA — 原文：「进度是粗估，别拿它横向比。」 */}
+        <TbaPlate fig="FIG. TBA-2" label="待补" slipX={22} slipY={-12} size={184} blue depth={0.5} />
       </div>
     </div>
   </section>
@@ -263,20 +268,9 @@ const stats = [
     border-top: none;
   }
 
-  /* Placeholder standing in for copy that has not been written yet. Framed in
-     the same hairline as every other figure on the site, and desaturated so a
-     joke image does not put a second colour on a page that has one. Delete the
-     filter to show it in colour.
-     The source was a 698 KB GIF; re-encoded to animated WebP at the same 216px
-     and the same 61 frames, it is 145 KB. */
-  .tba {
-    display: block;
-    width: 216px;
-    max-width: 100%;
-    height: auto;
-    border: 1px solid var(--line);
-    filter: grayscale(1) contrast(1.05);
-  }
+  /* The plates hang their captions off the bottom-left corner and slip a few
+     pixels off their columns, so the section needs room for both. */
+  .section .measure { display: inline-flex; }
 
   @media (max-width: 960px) {
     .lab-head {

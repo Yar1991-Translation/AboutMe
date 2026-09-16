@@ -1,0 +1,185 @@
+---
+/**
+ * A figure plate for a specimen that has not been supplied yet.
+ *
+ * Same DOM shape as FigurePlate and SpecimenPlate (`.plate` > overlay + frame +
+ * caption), which means the whole existing apparatus applies without a line of
+ * new motion code: the layered entrance in reveal.ts, the blueprint linework
+ * plotted on by draw.ts, the pop-in and ambient pulse on the blue node.
+ *
+ * Two of these are meant to be read side by side, and being a matched pair is
+ * exactly what they must NOT look like. Each is printed wrong in its own way:
+ *
+ *   - the plate sits a few pixels off its column — left one way, right the
+ *     other — and never returns to register
+ *   - the hairline frame is offset from the image it is supposed to be
+ *     registering, so the apparatus and the subject disagree about where the
+ *     edge is
+ *   - the second plate is pulled in Klein Blue instead of ink
+ *
+ * The overlay itself is misregistered by construction, the same as every other
+ * plate on the site: the diagonal deliberately misses the centre and the
+ * triangle sits off the grid.
+ *
+ * Offsets are written with `top`/`left`, never `transform` — the site's own
+ * rule. GSAP owns `transform` here (parallax, reveal), and a CSS transform on
+ * the same element would be silently overwritten by the first tween that runs.
+ */
+interface Props {
+  fig?: string
+  label?: string
+  /** how far this particular print slipped off its column, in px */
+  slipX?: number
+  slipY?: number
+  /** pull the plate in Klein Blue rather than ink */
+  blue?: boolean
+  /** depth plane handed to the parallax pass; negative lags the scroll */
+  depth?: number
+  /** printed width in px. Two prints of one specimen are not the same size. */
+  size?: number
+}
+
+const {
+  fig = 'FIG. TBA',
+  label = '内容待补',
+  slipX = -6,
+  slipY = 8,
+  blue = false,
+  depth = -0.5,
+  size = 216,
+} = Astro.props
+
+const alt = `TBA — ${label}`
+
+/** registration marks, one per corner */
+const CORNERS = [
+  [18, 18],
+  [198, 18],
+  [18, 198],
+  [198, 198],
+]
+---
+
+<div
+  class="tba-plate"
+  style={`--slip-x: ${slipX}px; --slip-y: ${slipY}px; --plate-size: ${size}px;`}
+>
+  <div class={`plate plate--tba${blue ? ' plate--blue-ink' : ''}`} data-depth={depth}>
+    <img
+      class="plate-img"
+      src="/TBA.webp"
+      alt={alt}
+      width="216"
+      height="216"
+      loading="lazy"
+      decoding="async"
+    />
+
+    {blue && <div class="plate-ink" aria-hidden="true"></div>}
+
+    <svg
+      class="plate-overlay"
+      viewBox="0 0 216 216"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <!-- registration marks -->
+      <g class="plate-reg">
+        {
+          CORNERS.map(([cx, cy]) => (
+            <g>
+              <circle cx={cx} cy={cy} r="6" class="plate-line" fill="none" />
+              <line x1={cx - 10} y1={cy} x2={cx + 10} y2={cy} class="plate-line" />
+              <line x1={cx} y1={cy - 10} x2={cx} y2={cy + 10} class="plate-line" />
+            </g>
+          ))
+        }
+      </g>
+
+      <!-- crosshair, and the target it is aimed at -->
+      <line x1="8" y1="108" x2="208" y2="108" class="plate-line-soft" />
+      <line x1="108" y1="8" x2="108" y2="208" class="plate-line-soft" />
+      <rect x="54" y="54" width="108" height="108" class="plate-line" fill="none" />
+      <rect
+        x="68"
+        y="68"
+        width="80"
+        height="80"
+        class="plate-line"
+        fill="none"
+        transform="rotate(7 108 108)"
+      />
+
+      <!-- the deliberate miss: this diagonal does not pass through the centre -->
+      <line x1="16" y1="192" x2="152" y2="46" class="plate-diagonal" />
+
+      <!-- rule, left edge -->
+      <g class="plate-measure">
+        <line x1="34" y1="54" x2="34" y2="162" class="plate-line" />
+        <line x1="28" y1="54" x2="40" y2="54" class="plate-line" />
+        <line x1="28" y1="162" x2="40" y2="162" class="plate-line" />
+        <line x1="34" y1="90" x2="40" y2="90" class="plate-line-soft" />
+        <line x1="34" y1="126" x2="40" y2="126" class="plate-line-soft" />
+      </g>
+
+      <!-- nodes on the target corners, and one blue mark well off the grid -->
+      <rect x="51" y="51" width="5" height="5" class="plate-node" />
+      <rect x="160" y="51" width="5" height="5" class="plate-node" />
+      <rect x="51" y="160" width="5" height="5" class="plate-node" />
+      <rect x="160" y="160" width="5" height="5" class="plate-node" />
+      <circle cx="178" cy="72" r="3" class="plate-node--blue" />
+      <polygon points="184,148 208,178 160,178" class="plate-triangle" />
+    </svg>
+
+    <div class="plate-frame"></div>
+
+    <div class="plate-caption">
+      <span>{fig}</span>
+      <span>{label}</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Static offsets are layout, not motion — see the note in the frontmatter. */
+  .tba-plate {
+    position: relative;
+    top: var(--slip-y, 0);
+    left: var(--slip-x, 0);
+    width: var(--plate-size, 216px);
+    max-width: 100%;
+  }
+
+  .plate--tba {
+    aspect-ratio: 1;
+    /* keeps the Klein Blue ink layer blending with this plate's image and
+       nothing behind it */
+    isolation: isolate;
+  }
+
+  /* The frame is the registration apparatus. Offsetting it from the image is
+     the point: the edges do not agree, and no amount of looking fixes it. */
+  .plate--tba .plate-frame {
+    inset: -6px 8px 7px -5px;
+  }
+
+  /* Wrong ink. Multiply over a grayscale plate reads as a duotone instead of
+     a blue slab. The image underneath is pushed apart first: multiply keeps
+     darks dark, so more contrast in the plate means more of the specimen
+     survives the ink. */
+  .plate--blue-ink .plate-img {
+    filter: grayscale(1) contrast(1.3) brightness(1.06);
+  }
+  .plate-ink {
+    position: absolute;
+    inset: 0;
+    background: var(--blue);
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .plate--blue-ink .plate-caption {
+    border-color: var(--blue);
+  }
+</style>
