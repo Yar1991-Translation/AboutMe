@@ -1914,116 +1914,37 @@ html.has-reticle *:not(input):not(textarea):not(select):not(option) {
   transform: translateX(4px);
 }
 
-/* --- Page transition ----------------------------------------------------
-   The page does not slide, wipe or fade. It comes APART.
+/* --- Page transition -------------------------------------------------------
+   A short crossfade with a slight settle. Deliberately plain.
 
-   Both documents are briefly on screen at once, each shredded into scanlines
-   and shifted out of register from the other, with Klein Blue showing through
-   the gaps where they have torn. That interval — two states of the same page
-   occupying the same space and disagreeing — is the dissociative moment, and
-   it is the same device the h1 uses, run across the whole viewport.
+   Four attempts at something more emphatic live in this file's history: a
+   scanline tear (could not be composited, so it janked), named
+   view-transition groups per section (rules parsed, names applied, nothing
+   animated), and a staggered slab shutter (the overlay's listeners were
+   bound from a hoisted module script, which runs in the head, before the
+   overlay element exists — so the cover never appeared).
 
-   It is built entirely from view-transition pseudo-elements, so there is no
-   overlay node, nothing to keep in sync across the swap, and no JavaScript
-   driving it. An earlier attempt animated a DOM cover with GSAP and never
-   moved: requestAnimationFrame is not a clock you can rely on across a
-   transition.
-
-   The `--vt-stripe` custom property is the mask's scanline height. It runs
-   from taller than the viewport (a solid sheet, nothing shredded) down to a
-   few pixels (shredded to nothing). Registered with @property so the browser
-   can interpolate it — an unregistered custom property is a string and does
-   not animate. Where @property is unsupported the mask never resolves, which
-   degrades to a plain fade rather than to a broken page. */
-@property --vt-stripe {
-  syntax: '<length>';
-  inherits: false;
-  initial-value: 2400px;
-}
-
-/* The plate behind both impressions. Only ever visible through the tears. */
-::view-transition-group(root) {
-  background: var(--blue);
-  animation: none;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  mask-image: repeating-linear-gradient(
-    0deg,
-    #000 0 var(--vt-stripe),
-    transparent var(--vt-stripe) calc(var(--vt-stripe) * 1.55)
-  );
-  mask-size: 100% 100%;
-  mask-repeat: no-repeat;
-}
-
-/* The outgoing document tears and drags left, shredded finer as it goes.
-   Deliberately front-loaded: it is effectively gone inside 150ms. */
+   None of them could be verified in the environment they were written in.
+   A transition that might not run, or might run badly, is worse than one
+   that is merely quiet. */
 ::view-transition-old(root) {
-  z-index: 2;
-  animation: vt-tear 300ms cubic-bezier(0.55, 0, 0.9, 0.35) both;
+  animation: 200ms cubic-bezier(0.22, 1, 0.36, 1) both vt-out;
 }
-
-/* The incoming one arrives from the opposite side, already shredded, and
-   knits itself back together — overshooting slightly, so it settles rather
-   than simply stopping. */
 ::view-transition-new(root) {
-  z-index: 1;
-  animation: vt-reform 620ms 110ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: 300ms 60ms cubic-bezier(0.22, 1, 0.36, 1) both vt-in;
 }
 
-@keyframes vt-tear {
-  0% {
-    --vt-stripe: 2400px;
-    transform: none;
-    opacity: 1;
-  }
-  /* One beat at full register. Without it the first frame the reader sees is
-     already shredded, which reads as a jump cut — the tear only registers if
-     there is a whole page in living memory to compare it against. */
-  8% {
-    --vt-stripe: 2400px;
-    transform: none;
-    opacity: 1;
-  }
-  30% {
-    --vt-stripe: 130px;
-    transform: translateX(-22px) skewX(-1.4deg);
-    opacity: 1;
-  }
-  68% {
-    --vt-stripe: 34px;
-    transform: translateX(-64px) skewX(-2.6deg);
-    opacity: 0.95;
-  }
-  100% {
-    --vt-stripe: 8px;
-    transform: translateX(-150px) skewX(-4deg);
+@keyframes vt-out {
+  to {
     opacity: 0;
+    transform: translateY(-6px) scale(0.997);
   }
 }
 
-@keyframes vt-reform {
-  0% {
-    --vt-stripe: 8px;
-    transform: translateX(160px) skewX(4deg) scale(1.04);
+@keyframes vt-in {
+  from {
     opacity: 0;
-  }
-  36% {
-    --vt-stripe: 30px;
-    transform: translateX(34px) skewX(1.1deg) scale(1.018);
-    opacity: 1;
-  }
-  70% {
-    --vt-stripe: 260px;
-    transform: translateX(-5px) skewX(-0.15deg) scale(0.998);
-    opacity: 1;
-  }
-  100% {
-    --vt-stripe: 2400px;
-    transform: none;
-    opacity: 1;
+    transform: translateY(10px) scale(1.003);
   }
 }
 
@@ -2031,10 +1952,6 @@ html.has-reticle *:not(input):not(textarea):not(select):not(option) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none !important;
-    mask-image: none;
-  }
-  ::view-transition-group(root) {
-    background: var(--bg);
   }
 }
 
