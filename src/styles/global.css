@@ -1588,6 +1588,14 @@ html.js-motion:not(.motion-ready) .rise {
   opacity: 0;
 }
 
+/* ...unless the effect that was supposed to fade them back in has already
+   reported itself dead. Then nothing is coming, and the rule above is just a
+   way to keep the page blank. */
+html[data-motion-failed-reveal] .rise,
+html[data-motion-failed-reveal] .xcard {
+  opacity: 1 !important;
+}
+
 /* --- Ghost / echo typography ---------------------------------------------- */
 .ghost-host {
   position: relative;

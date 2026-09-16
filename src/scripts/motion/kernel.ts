@@ -119,6 +119,20 @@ export function boot(): void {
   if (booted) return
   booted = true
 
+  /* Everything below is individually guarded, but "individually guarded" is a
+     claim about today's code. `motion-ready` is the only thing standing
+     between a reader and a page whose every `.rise` is at opacity 0, so it is
+     released unconditionally — including on a throw nobody predicted. */
+  try {
+    bootInternal()
+  } catch (err) {
+    console.warn('[motion] boot threw; the pre-hidden state is being released anyway', err)
+  } finally {
+    root.classList.add('motion-ready')
+  }
+}
+
+function bootInternal(): void {
   mm = gsap.matchMedia()
   tickerFn = (time, delta) => runFrame(time, delta)
   gsap.ticker.add(tickerFn)
@@ -174,14 +188,14 @@ export function boot(): void {
     }
   }
 
-  // Releases the pre-JS hidden state. Safe to add now: any `gsap.from` has
-  // already written its start values inline, and failed effects were released
-  // above, so nothing stays invisible.
-  root.classList.add('motion-ready')
-
   scheduleRefresh(0)
   document.fonts?.ready.then(() => scheduleRefresh(0))
-  window.addEventListener('load', () => scheduleRefresh(0), { once: true })
+  /* Only while the document is still loading. `boot` runs again on every
+     navigation, and a `load` listener added after `load` has already fired
+     never fires and is never removed — one dead listener per page visited. */
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', () => scheduleRefresh(0), { once: true })
+  }
 
   // The URL bar showing/hiding on mobile fires a resize; without this every
   // one of those triggers a full ScrollTrigger recalculation.
@@ -192,6 +206,16 @@ export function disarm(): void {
   if (!booted) return
   booted = false
 
+  /* Teardown, not setup. If it throws halfway the layer has to stay re-armable,
+     so the flag is cleared first and the body is contained. */
+  try {
+    teardown()
+  } catch (err) {
+    console.warn('[motion] teardown threw; the layer stays re-armable', err)
+  }
+}
+
+function teardown(): void {
   if (mm) {
     mm.kill()
     mm = null
