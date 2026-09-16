@@ -17,6 +17,9 @@
   /* 1200x630 — the one ratio every chat client crops consistently.
      Most of them render it in a dark UI, so the paper plate is the version
      that stands out; and it is the site's primary theme anyway. */
+  /* Width is fixed at 1200 — that is the size every scraper works from, and
+     the ARCHIVE lockup is sized to it. Only the height varies, so the ratio
+     is a URL param rather than a second copy of this file. */
   .og {
     position:relative; width:1200px; height:630px; overflow:hidden;
     background:var(--bg); color:var(--ink); font-family:var(--sans);
@@ -105,5 +108,15 @@
     </div>
   </div>
 </div>
+
+<script>
+  // ?h=900 → 4:3, ?h=675 → 16:9, default 630 (the 1.91:1 open-graph standard)
+  const q = new URLSearchParams(location.search)
+  const h = parseInt(q.get('h') || '630', 10)
+  const w = parseInt(q.get('w') || '1200', 10)
+  const card = document.querySelector('.og')
+  card.style.width = w + 'px'
+  card.style.height = h + 'px'
+</script>
 </body>
 </html>
