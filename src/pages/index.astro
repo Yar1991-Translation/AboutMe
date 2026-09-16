@@ -4,11 +4,17 @@ import Ticker from '../components/Ticker.astro'
 import { getCollection } from 'astro:content'
 import { sortPostsByDate, sortExperiments, lastTouched } from '../lib/utils'
 import { statusOf } from '../data/experiments'
-import { site } from '../data/site'
 
 const latestPosts = sortPostsByDate(await getCollection('blog')).slice(0, 4)
-const bench = sortExperiments(await getCollection('experiments')).slice(0, 3)
-const benchTotal = (await getCollection('experiments')).filter((e) => !e.data.draft).length
+const allExperiments = await getCollection('experiments')
+const bench = sortExperiments(allExperiments).slice(0, 3)
+const benchTotal = allExperiments.filter((e) => !e.data.draft).length
+
+// Section numbers count what the page actually renders. They used to be
+// hard-coded, so removing a section left the next one labelled SEC. 02 with no
+// SEC. 01 anywhere on the page.
+let sec = 0
+const nextSec = () => String(++sec).padStart(2, '0')
 ---
 
 <BaseLayout>
@@ -20,8 +26,9 @@ const benchTotal = (await getCollection('experiments')).filter((e) => !e.data.dr
       </div>
       <h1 class="hero-title rise" data-depth="1">Archive<span class="accent">.</span></h1>
       <div class="hero-side rise">
-        <span class="side-label">Subject / 对象</span>
-        <p>{site.title}</p>
+        <span class="side-label">Epigraph / 题词</span>
+        <p class="hero-quote">"原作对译作是不忠实的。"</p>
+        <cite class="hero-cite">Jorge Luis Borges</cite>
       </div>
       <div class="hero-meta rise">
         <span>25.03° N, 101.55° E</span>
@@ -42,7 +49,7 @@ const benchTotal = (await getCollection('experiments')).filter((e) => !e.data.dr
       <div class="wrap">
         <div class="sec-head">
           <h2 data-scramble>Bench</h2>
-          <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. 01 — Unfinished</span>
+          <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. {nextSec()} — Unfinished</span>
         </div>
         <p class="small" style="line-height: 1.75; opacity: 0.8; max-width: 52ch; margin-bottom: 40px;">
           做了一半、还没删的东西。{benchTotal} 件在册。
@@ -107,7 +114,7 @@ const benchTotal = (await getCollection('experiments')).filter((e) => !e.data.dr
     <div class="wrap">
       <div class="sec-head">
         <h2 data-scramble>Updates</h2>
-        <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. 02 — Log</span>
+        <span class="sec-no"><span class="sec-no-dot" aria-hidden="true"></span>SEC. {nextSec()} — Log</span>
       </div>
       <ul class="rows">
         {latestPosts.map((post) => (

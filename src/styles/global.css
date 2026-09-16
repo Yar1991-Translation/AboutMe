@@ -405,6 +405,23 @@ em { font-style: italic; }
   display: block;
 }
 
+/* The epigraph reads as another field of the dossier: the quote in ink, the
+   attribution in the same mono/uppercase register as every other label. */
+.hero-quote {
+  font-size: var(--fs-small);
+  line-height: 1.75;
+  margin-bottom: 10px;
+}
+.hero-cite {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-style: normal;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue-ink);
+}
+
 .hero-meta {
   grid-column: 1 / -1;
   margin-top: 56px;

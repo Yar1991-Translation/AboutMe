@@ -19,6 +19,9 @@ const counts = countByStatus(all)
 // dead control, and there are five statuses for what is usually a short list.
 const filters = STATUS_ORDER.filter((s) => (counts[s] ?? 0) > 0)
 
+/** the ticker reads like instrument output, so it is zero-padded like one */
+const pad = (n: number) => String(n).padStart(2, '0')
+
 const stats = [
   { key: 'Total', val: all.length },
   { key: 'In motion', val: counts.active ?? 0 },
@@ -80,12 +83,12 @@ const stats = [
     reverse
     speed={34}
     items={[
-      'In motion 01',
-      'Paused 01',
-      'Dormant 01',
-      'Seeds 01',
-      'Dropped 00',
-      'Status is the content',
+      `In motion ${pad(counts.active ?? 0)}`,
+      `Paused ${pad(counts.paused ?? 0)}`,
+      `Dormant ${pad(counts.dormant ?? 0)}`,
+      `Seeds ${pad(counts.seed ?? 0)}`,
+      `Dropped ${pad(counts.abandoned ?? 0)}`,
+      'Unfinished work',
       'Nothing here is finished',
     ]}
   />
